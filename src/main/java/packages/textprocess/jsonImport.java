@@ -31,16 +31,12 @@ public class jsonImport {
 
     public static void printJsonObject(JSONObject jsonObj) {
         for (Object key : jsonObj.keySet()) {
-            // based on you key types
+
             String keyStr = (String) key;
-            JSONObject keyvalue = (JSONObject) jsonObj.get(keyStr);
-            // System.out.println("key: " + keyStr + " value: " + keyvalue);
-            // Print key and value
+            String keyvalue = (String) jsonObj.get(keyStr);
+
             System.out.println("key: " + keyStr + " value: " + keyvalue);
 
-            // for nested objects iteration if required
-            // if (keyvalue instanceof JSONObject)
-            // printJsonObject((JSONObject) keyvalue);
         }
     }
 }
