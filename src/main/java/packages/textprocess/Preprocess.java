@@ -1,9 +1,15 @@
+
+/**
+ * @author Sahil
+ */
+
 package packages.textprocess;
 
 import java.util.*;
 import com.github.chen0040.data.text.TextFilter;
 import com.github.chen0040.data.text.StopWordRemoval;
 import com.github.chen0040.data.text.PorterStemmer;
+import org.json.simple.JSONObject;
 
 public class Preprocess {
 
@@ -17,11 +23,25 @@ public class Preprocess {
 
     public static void main(String[] args) {
         Preprocess p = new Preprocess();
-        List<String> processed = p.keywords(
-                "I've managed to setup the chroot chroots but I'm unsure how to get the chroot to recognise usb devices. I'll be doing so work with microcontrollers hence I neeed to to recognise my usb based programmer.</p>\n\n<p>For starters how do I populate the dev directory with the host dev directory(android)?</p>\n\n<p>Is it then just a matter of getting the right kernel modules loaded?</p>\n\n<p>I'm running prime1.5 firmware on the asus transformer</p>");
-        for (String key : processed) {
-            System.out.println(key);
+        JSONObject questions = jsonImport.getjson("src/main/resources/android_questions.json");
+        List<String> processed = new ArrayList<String>();
+        
+        for(Object key : questions.keySet()){
+            String k = (String) key;
+            JSONObject value = (JSONObject) questions.get(key);
+            processed = p.keywords((String)value.get("body"));
+
+            System.out.print ("\n\nQ Id : " + k + " \t ");
+
+            System.out.print("Keywords : [ " );
+            for (String id : processed) {
+                System.out.print(id);
+                System.out.print(" , ");
+            }
+            System.out.print(" ]");
+
         }
+
 
     }
 

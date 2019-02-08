@@ -24,6 +24,16 @@
       <artifactId>java-data-text</artifactId>
       <version>1.0.3</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.opennlp</groupId>
+      <artifactId>opennlp-tools</artifactId>
+      <version>1.8.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
+      <version>1.1.1</version>
+    </dependency>
   </dependencies>
   <build>
     <pluginManagement>
