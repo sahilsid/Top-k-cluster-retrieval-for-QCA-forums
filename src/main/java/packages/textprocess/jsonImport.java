@@ -34,7 +34,6 @@ public class jsonImport {
 
             String keyStr = (String) key;
             String keyvalue = (String) jsonObj.get(keyStr);
-
             System.out.println("key: " + keyStr + " value: " + keyvalue);
 
         }

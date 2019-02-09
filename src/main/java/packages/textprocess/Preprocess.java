@@ -16,7 +16,7 @@ public class Preprocess {
     TextFilter stemmer = new PorterStemmer();
     StopWordRemoval filter = new StopWordRemoval();
 
-    Preprocess() {
+    public Preprocess() {
         filter.setRemoveNumbers(true);
         filter.setRemoveXmlTag(true);
     }
@@ -88,7 +88,7 @@ public class Preprocess {
         Preprocess p = new Preprocess();
         List<String> processed = p.stopwords(text);
         processed = p.stem(processed);
-
+        
         return processed;
     }
 
