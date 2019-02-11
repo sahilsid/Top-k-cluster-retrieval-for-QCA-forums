@@ -1,5 +1,5 @@
 
-package packages.cluster;
+package packages.kmedoid;
 
 import java.util.*;
 import packages.textprocess.*;
@@ -10,7 +10,7 @@ import com.google.common.collect.ArrayListMultimap;
 /**
  * generate
  */
-public class generate {
+public class Cluster {
 
     int k;
     Multimap<String, String> clusters;
@@ -18,12 +18,12 @@ public class generate {
     List<String> centroids;
 
     public static void main(String[] args) {
-        generate a = new generate(3);
+        Cluster a = new Cluster(4);
         // a.displaydata();
         // a.initialize();
     }
 
-    generate(int a) {
+    Cluster(int a) {
         k = a;
         clusters = ArrayListMultimap.create();
         data = new HashMap<String, List<String>>();

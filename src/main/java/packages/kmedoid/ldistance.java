@@ -1,4 +1,4 @@
-package packages.cluster;
+package packages.kmedoid;
 
 import java.io.*;
 import java.util.*;
