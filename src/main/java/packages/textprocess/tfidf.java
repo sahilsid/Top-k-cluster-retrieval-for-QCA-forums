@@ -69,8 +69,10 @@ public class tfidf {
 
     Double similiarity(String q1, String q2) {
         List<String> common_words = new ArrayList<String>(data.get(q1));
-        common_words.retainAll(data.get(q2));
         Double psum = 0.0, i_sum_1 = 0.0, i_sum_2 = 0.0;
+              
+        common_words.retainAll(data.get(q2));
+
         for (String common_word : common_words) {
             i_sum_1 = i_sum_1 + valueMap.get(q1 + "." + common_word);
             i_sum_2 = i_sum_2 + valueMap.get(q2 + "." + common_word);
