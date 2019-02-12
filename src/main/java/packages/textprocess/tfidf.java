@@ -34,7 +34,6 @@ public class tfidf {
             data.put(k, processed);
         }
         initialize();
-        // System.out.println(data);
     }
 
     void initialize() {
@@ -70,7 +69,7 @@ public class tfidf {
     Double similiarity(String q1, String q2) {
         List<String> common_words = new ArrayList<String>(data.get(q1));
         Double psum = 0.0, i_sum_1 = 0.0, i_sum_2 = 0.0;
-              
+
         common_words.retainAll(data.get(q2));
 
         for (String common_word : common_words) {
@@ -91,6 +90,6 @@ public class tfidf {
                     similiarityMap.put(qid1 + "." + qid2, similiarity((String) qid1, (String) qid2));
             }
         }
-        //System.out.println(similiarityMap);
+        System.out.println( "Similiarity Map Generated : \n \t" + similiarityMap);
     }
 }
