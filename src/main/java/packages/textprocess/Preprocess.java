@@ -87,7 +87,7 @@ public class Preprocess {
     public List<String> keywords(String text) {
         Preprocess p = new Preprocess();
         List<String> processed = p.stopwords(text);
-        processed = p.stem(processed);
+        //processed = p.stem(processed);
         
         return processed;
     }
