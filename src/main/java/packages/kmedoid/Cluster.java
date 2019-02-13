@@ -16,7 +16,7 @@ public class Cluster {
     Multimap<String, String> clusters;
     Map<String, List<String>> data;
     List<String> centroids;
-
+    Tfidf tfidf;
     public static void main(String[] args) {
         Cluster a = new Cluster(4);
         // a.displaydata();
@@ -27,6 +27,7 @@ public class Cluster {
         k = a;
         clusters = ArrayListMultimap.create();
         data = new HashMap<String, List<String>>();
+        tfidf = new Tfidf();
         Preprocess p = new Preprocess();
         JSONObject questions = jsonImport.getjson("src/main/resources/android_questions.json");
         List<String> processed = new ArrayList<String>();
@@ -59,16 +60,16 @@ public class Cluster {
     }
 
     public void clusterize() {
-        int distance, min;
+        Double similiarity, max;
         clusters.clear();
         String nearestCentroid = "";
         for (String qid : data.keySet()) {
-            distance = 0;
-            min = -1;
+            similiarity = 0.0;
+            max = -1.0;
             for (String c : centroids) {
-                distance = ldistance.distance(qid, c);
-                if ((min == -1 || min > distance)) {
-                    min = distance;
+                similiarity = tfidf.similiarity(qid, c);
+                if ((max == -1 || max < similiarity)) {
+                    max = similiarity;
                     nearestCentroid = c;
                 }
             }
@@ -89,24 +90,24 @@ public class Cluster {
         String medoid = "";
         List<String> tempCentroid = new ArrayList<String>();
         boolean centroid_change = false;
-        int distance = 0, min = -1;
+        Double similiarity = 0.0, max = -1.0;
         for (String elem : centroids) {
             tempCentroid.add(elem);
         }
         for (String centroid : tempCentroid) {
-            min = -1;
+            max = -1.0;
             System.out.println(" Cluster  : " + centroid);
             for (String node : clusters.get(centroid)) {
-                distance = 0;
+                similiarity = 0.0;
                 for (String clusterNeighbour : clusters.get(centroid)) {
-                    distance = distance + ldistance.distance(node, clusterNeighbour);
+                    similiarity = similiarity + tfidf.similiarity(node, clusterNeighbour);
                 }
-                System.out.println("\t node  : " + node + " \t \t DistSum : " + distance);
+                System.out.println("\t node  : " + node + " \t \t DistSum : " + similiarity);
 
-                // System.out.println(" node : " + node + " Distance sum : " + distance + " min
-                // : " + min);
-                if (distance < min || min == -1) {
-                    min = distance;
+                // System.out.println(" node : " + node + " similiarity sum : " + similiarity + " max
+                // : " + max);
+                if (similiarity > max || max == -1) {
+                    max = similiarity;
                     medoid = node;
                 }
             }

@@ -9,17 +9,17 @@ import org.json.simple.JSONObject;
 /**
  * tfidf
  */
-public class tfidf {
+public class Tfidf {
 
     Map<String, Double> valueMap;
     Map<String, Double> similiarityMap;
     Map<String, List<String>> data;
 
     public static void main(String[] args) {
-        tfidf a = new tfidf();
+        Tfidf a = new Tfidf();
     }
 
-    tfidf() {
+    public Tfidf() {
         data = new HashMap<String, List<String>>();
         valueMap = new HashMap<String, Double>();
         similiarityMap = new HashMap<String, Double>();
@@ -66,7 +66,7 @@ public class tfidf {
         generateSimiliarityMap();
     }
 
-    Double similiarity(String q1, String q2) {
+    public Double similiarity(String q1, String q2) {
         List<String> common_words = new ArrayList<String>(data.get(q1));
         Double psum = 0.0, i_sum_1 = 0.0, i_sum_2 = 0.0;
 
@@ -90,6 +90,14 @@ public class tfidf {
                     similiarityMap.put(qid1 + "." + qid2, similiarity((String) qid1, (String) qid2));
             }
         }
-        System.out.println( "Similiarity Map Generated : \n \t" + similiarityMap);
+        System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
+    }
+
+    public Double getSimiliarity(String qid1, String qid2) {
+        Double similiarity = 0.0;
+        similiarity = (similiarityMap.containsKey(qid1 + "." + qid2)
+                ? similiarityMap.get(qid1 + "." + qid2)
+                : (similiarityMap.containsKey(qid1 + "." + qid2) ? similiarityMap.get(qid2 + "." + qid1) : 0.0));
+        return similiarity;
     }
 }
