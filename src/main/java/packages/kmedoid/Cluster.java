@@ -20,7 +20,7 @@ public class Cluster {
     Preprocess p;
     List<String> processed;
 
-    Tfidf tfidf;
+    public Tfidf tfidf;
 
     public static void main(String[] args) {
         Cluster a = new Cluster(4);
@@ -28,13 +28,13 @@ public class Cluster {
 
         for (String k : a.data.keySet())
             qids.add(k);
-            
+
         a.displaydata();
         a.reinitialize(qids);
         // a.initialize();
     }
 
-    Cluster(int a) {
+    public Cluster(int a) {
         k = a;
         clusters = ArrayListMultimap.create();
         data = new HashMap<String, List<String>>();
