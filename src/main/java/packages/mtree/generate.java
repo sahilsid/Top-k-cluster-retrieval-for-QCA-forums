@@ -34,7 +34,6 @@ public class generate {
         while (nextLevel.size()/2 > 0) {
             a.reinitialize(nextLevel, nextLevel.size() / 2);
             nextLevel.clear();
-            System.out.println("New Cluster  : "+a.clusters.keySet());
             for (String key : a.clusters.keySet()) {
                 nextLevel.add(key);
                 tree.put(key, new mtree_beta(new Data(key)));
@@ -43,7 +42,6 @@ public class generate {
                 }
                 i++;
             }
-            System.out.println("Next Levels  : "+nextLevel);
         }
         root = tree.get(nextLevel.get(0));
         System.out.println("Root  : ");root.display();
