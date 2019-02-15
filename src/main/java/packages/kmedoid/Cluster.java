@@ -13,7 +13,7 @@ import com.google.common.collect.ArrayListMultimap;
 public class Cluster {
 
     int k;
-    Multimap<String, String> clusters;
+    public Multimap<String, String> clusters;
     Map<String, List<String>> data;
     List<String> centroids;
     JSONObject questions;

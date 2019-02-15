@@ -41,6 +41,13 @@ public class mtree_beta {
         return children;
     }
 
+    public void display() {
+        System.out.println("Parent : " + this.data.id);
+        for ( mtree_beta child : this.children) {
+            System.out.println("Children : " + child.data.id + " Similiarity with parent : " + child.data.parentSimiliarity);
+        }
+    }
+
     public Data getData() {
         return data;
     }
@@ -57,6 +64,4 @@ public class mtree_beta {
     public mtree_beta getParent() {
         return parent;
     }
-
-    
 }
