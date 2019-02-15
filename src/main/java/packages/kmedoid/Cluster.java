@@ -30,7 +30,7 @@ public class Cluster {
             qids.add(k);
 
         a.displaydata();
-        a.reinitialize(qids);
+        a.reinitialize(qids,2);
         // a.initialize();
     }
 
@@ -56,12 +56,13 @@ public class Cluster {
         }
     }
 
-    public void reinitialize(List<String> newqids) {
+    public void reinitialize(List<String> newqids,int no) {
 
         processed.clear();
         data.clear();
         centroids.clear();
         clusters.clear();
+        k=no;
 
         for (Object key : questions.keySet()) {
             String k = (String) key;

@@ -20,16 +20,32 @@ public class generate {
     public static void main(String[] args) {
         Cluster a = new Cluster(4);
         int i = 0;
-        List<mtree_beta> tree = new ArrayList<mtree_beta>();
+        Map<String, mtree_beta> tree = new HashMap<String, mtree_beta>();
+        mtree_beta root;
+        List<String> nextLevel = new ArrayList<String>();
         for (String key : a.clusters.keySet()) {
-            tree.add(i, new mtree_beta(new Data(key)));
+            nextLevel.add(key);
+            tree.put(key, new mtree_beta(new Data(key)));
             for (String children : a.clusters.get(key)) {
-                tree.get(i).addChild(new mtree_beta(new Data(children)),a.tfidf);
+                tree.get(key).addChild(new mtree_beta(new Data(children)), a.tfidf);
             }
             i++;
         }
-        for (mtree_beta node : tree) {
-            node.display();
+        while (a.clusters.size() > 1) {
+            a.reinitialize(nextLevel, nextLevel.size() / 2);
+            nextLevel.clear();
+            System.out.println("New Cluster  : "+a.clusters.keySet());
+            for (String key : a.clusters.keySet()) {
+                nextLevel.add(key);
+                tree.put(key, new mtree_beta(new Data(key)));
+                for (String children : a.clusters.get(key)) {
+                    tree.get(key).addChild(tree.get(children), a.tfidf);
+                }
+                i++;
+            }
+        }
+        for (Object node : tree.keySet()) {
+            tree.get(node).display();
         }
     }
 }
