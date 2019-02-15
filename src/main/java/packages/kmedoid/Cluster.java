@@ -16,10 +16,21 @@ public class Cluster {
     Multimap<String, String> clusters;
     Map<String, List<String>> data;
     List<String> centroids;
+    JSONObject questions;
+    Preprocess p;
+    List<String> processed;
+
     Tfidf tfidf;
+
     public static void main(String[] args) {
         Cluster a = new Cluster(4);
-        // a.displaydata();
+        List<String> qids = new ArrayList<String>();
+
+        for (String k : a.data.keySet())
+            qids.add(k);
+            
+        a.displaydata();
+        a.reinitialize(qids);
         // a.initialize();
     }
 
@@ -28,15 +39,37 @@ public class Cluster {
         clusters = ArrayListMultimap.create();
         data = new HashMap<String, List<String>>();
         tfidf = new Tfidf();
-        Preprocess p = new Preprocess();
-        JSONObject questions = jsonImport.getjson("src/main/resources/android_questions.json");
-        List<String> processed = new ArrayList<String>();
+        p = new Preprocess();
+        questions = jsonImport.getjson("src/main/resources/android_questions.json");
+        processed = new ArrayList<String>();
 
         for (Object key : questions.keySet()) {
             String k = (String) key;
             JSONObject value = (JSONObject) questions.get(key);
             processed = p.keywords((String) value.get("body"));
             data.put(k, processed);
+        }
+        initialize();
+        while (formNewCentroids()) {
+            System.out.println("New Centroids :  " + centroids);
+            clusterize();
+        }
+    }
+
+    public void reinitialize(List<String> newqids) {
+
+        processed.clear();
+        data.clear();
+        centroids.clear();
+        clusters.clear();
+
+        for (Object key : questions.keySet()) {
+            String k = (String) key;
+            JSONObject value = (JSONObject) questions.get(key);
+            if (newqids.contains(k)) {
+                processed = p.keywords((String) value.get("body"));
+                data.put(k, processed);
+            }
         }
         initialize();
         while (formNewCentroids()) {
@@ -104,7 +137,8 @@ public class Cluster {
                 }
                 System.out.println("\t node  : " + node + " \t \t DistSum : " + similiarity);
 
-                // System.out.println(" node : " + node + " similiarity sum : " + similiarity + " max
+                // System.out.println(" node : " + node + " similiarity sum : " + similiarity +
+                // " max
                 // : " + max);
                 if (similiarity > max || max == -1) {
                     max = similiarity;
