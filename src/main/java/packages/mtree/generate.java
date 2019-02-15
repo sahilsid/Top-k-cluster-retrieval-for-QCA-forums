@@ -31,7 +31,7 @@ public class generate {
             }
             i++;
         }
-        while (a.clusters.size() > 1) {
+        while (nextLevel.size()/2 > 0) {
             a.reinitialize(nextLevel, nextLevel.size() / 2);
             nextLevel.clear();
             System.out.println("New Cluster  : "+a.clusters.keySet());
@@ -43,7 +43,11 @@ public class generate {
                 }
                 i++;
             }
+            System.out.println("Next Levels  : "+nextLevel);
         }
+        root = tree.get(nextLevel.get(0));
+        System.out.println("Root  : ");root.display();
+
         for (Object node : tree.keySet()) {
             tree.get(node).display();
         }

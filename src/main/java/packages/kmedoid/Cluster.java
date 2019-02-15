@@ -57,12 +57,13 @@ public class Cluster {
     }
 
     public void reinitialize(List<String> newqids,int no) {
+        System.out.println("New cluster size :  " + no);
 
         processed.clear();
         data.clear();
         centroids.clear();
         clusters.clear();
-        k=no;
+        this.k=no;
 
         for (Object key : questions.keySet()) {
             String k = (String) key;
