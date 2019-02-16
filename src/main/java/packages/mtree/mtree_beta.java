@@ -61,6 +61,20 @@ public class mtree_beta {
             this.data.setSimiliarity(tfidf.similiarity(parent.data.id, this.data.id));
     }
 
+    public void display() {
+        Queue<mtree_beta> node = new LinkedList<mtree_beta>();
+        node.add(this);
+        while (node.size() > 0) {
+            mtree_beta temp = node.remove();
+            if (temp != null && temp.data != null)
+                System.out.print("\t"+temp.data.id);
+            for (mtree_beta next : temp.children) {
+                if (next != null)
+                    node.add(next);
+            }
+        }
+    }
+
     public mtree_beta getParent() {
         return parent;
     }

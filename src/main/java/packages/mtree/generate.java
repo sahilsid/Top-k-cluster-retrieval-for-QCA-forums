@@ -31,24 +31,26 @@ public class generate {
             }
         }
         System.out.println("initialized  : ");
-
+        int i=0;
         while (nextLevel.size() / 2 > 1) {
             System.out.println("New Level Formation  : ");
             a.reinitialize(nextLevel, nextLevel.size() / 2);
             nextLevel.clear();
             for (String key : a.clusters.keySet()) {
-                nextLevel.add(key);
-                tree.put(key, new mtree_beta(new Data(key)));
+                nextLevel.add(key+i);
+                tree.put(key+i, new mtree_beta(new Data(key)));
                 for (String children : a.clusters.get(key)) {
                     if (children != key)
-                        tree.get(key).addChild(tree.get(children), a.tfidf);
+                        tree.get(key+i).addChild(tree.get(children), a.tfidf);
                 }
 
             }
+            i++;
         }
         for (String top : nextLevel) {
             root.addChild(tree.get(top), a.tfidf);
         }
+        root.display();
     }
 
 }
