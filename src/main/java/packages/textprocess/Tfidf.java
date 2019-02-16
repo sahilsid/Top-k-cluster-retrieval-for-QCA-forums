@@ -90,7 +90,7 @@ public class Tfidf {
                     similiarityMap.put(qid1 + "." + qid2, similiarity((String) qid1, (String) qid2));
             }
         }
-        System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
+        //System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
     }
 
     public Double getSimiliarity(String qid1, String qid2) {

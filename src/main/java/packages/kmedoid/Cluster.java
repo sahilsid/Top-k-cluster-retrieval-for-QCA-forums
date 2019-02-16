@@ -51,13 +51,34 @@ public class Cluster {
         }
         initialize();
         while (formNewCentroids()) {
-            System.out.println("New Centroids :  " + centroids);
+    //        System.out.println("New Centroids :  " + centroids);
             clusterize();
         }
     }
 
+    public void reinitialize(int a){
+        
+        processed.clear();
+        centroids.clear();
+        clusters.clear();
+        this.k=a;
+
+        for (Object key : questions.keySet()) {
+            String k = (String) key;
+            JSONObject value = (JSONObject) questions.get(key);
+            processed = p.keywords((String) value.get("body"));
+            data.put(k, processed);
+        }
+        initialize();
+        while (formNewCentroids()) {
+    //        System.out.println("New Centroids :  " + centroids);
+            clusterize();
+        }
+
+    }
+
     public void reinitialize(List<String> newqids,int no) {
-        System.out.println("New cluster size :  " + no);
+    //    System.out.println("New cluster size :  " + no);
 
         processed.clear();
         data.clear();
@@ -75,7 +96,7 @@ public class Cluster {
         }
         initialize();
         while (formNewCentroids()) {
-            System.out.println("New Centroids :  " + centroids);
+    //        System.out.println("New Centroids :  " + centroids);
             clusterize();
         }
     }
@@ -90,8 +111,13 @@ public class Cluster {
             }
             centroids.add((String) randomkey);
         }
-        System.out.println("Random Keys" + centroids);
+    //    System.out.println("Random Keys" + centroids);
         clusterize();
+        List<String> temp = new ArrayList<String>(clusters.keySet());
+        for (String var : temp) {
+            if(clusters.get(var).size()==1)
+                this.reinitialize(this.k-1);
+        }
     }
 
     public void clusterize() {
@@ -113,12 +139,12 @@ public class Cluster {
             if (!clusters.containsEntry(nearestCentroid, qid))
                 clusters.put(nearestCentroid, qid);
         }
-        System.out.println("Clusters : ");
+        // System.out.println("Clusters : ");
 
-        for (Object k : clusters.keySet()) {
-            System.out.print(k + "      : \t");
-            System.out.println(clusters.get((String) k));
-        }
+        // for (Object k : clusters.keySet()) {
+        //     System.out.print(k + "      : \t");
+        //     System.out.println(clusters.get((String) k));
+        // }
     }
 
     public boolean formNewCentroids() {
@@ -131,17 +157,18 @@ public class Cluster {
         }
         for (String centroid : tempCentroid) {
             max = -1.0;
-            System.out.println(" Cluster  : " + centroid);
+    //        System.out.println(" Cluster  : " + centroid);
             for (String node : clusters.get(centroid)) {
                 similiarity = 0.0;
                 for (String clusterNeighbour : clusters.get(centroid)) {
                     similiarity = similiarity + tfidf.similiarity(node, clusterNeighbour);
                 }
-                System.out.println("\t node  : " + node + " \t \t DistSum : " + similiarity);
+    //            System.out.println("\t node  : " + node + " \t \t DistSum : " + similiarity);
 
                 // System.out.println(" node : " + node + " similiarity sum : " + similiarity +
                 // " max
                 // : " + max);
+
                 if (similiarity > max || max == -1) {
                     max = similiarity;
                     medoid = node;
@@ -153,7 +180,7 @@ public class Cluster {
                 centroids.add(medoid);
             }
         }
-        System.out.println("New Centroids :  " + centroids);
+    //    System.out.println("New Centroids :  " + centroids);
 
         return centroid_change;
     }

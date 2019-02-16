@@ -18,36 +18,37 @@ import com.google.common.collect.ArrayListMultimap;
 public class generate {
 
     public static void main(String[] args) {
-        Cluster a = new Cluster(4);
-        int i = 0;
+        Cluster a = new Cluster(5);
         Map<String, mtree_beta> tree = new HashMap<String, mtree_beta>();
-        mtree_beta root;
+        mtree_beta root = new mtree_beta();
         List<String> nextLevel = new ArrayList<String>();
         for (String key : a.clusters.keySet()) {
             nextLevel.add(key);
             tree.put(key, new mtree_beta(new Data(key)));
             for (String children : a.clusters.get(key)) {
-                tree.get(key).addChild(new mtree_beta(new Data(children)), a.tfidf);
+                if (children != key)
+                    tree.get(key).addChild(new mtree_beta(new Data(children)), a.tfidf);
             }
-            i++;
         }
-        while (nextLevel.size()/2 > 0) {
+        System.out.println("initialized  : ");
+
+        while (nextLevel.size() / 2 > 1) {
+            System.out.println("New Level Formation  : ");
             a.reinitialize(nextLevel, nextLevel.size() / 2);
             nextLevel.clear();
             for (String key : a.clusters.keySet()) {
                 nextLevel.add(key);
                 tree.put(key, new mtree_beta(new Data(key)));
                 for (String children : a.clusters.get(key)) {
-                    tree.get(key).addChild(tree.get(children), a.tfidf);
+                    if (children != key)
+                        tree.get(key).addChild(tree.get(children), a.tfidf);
                 }
-                i++;
+
             }
         }
-        root = tree.get(nextLevel.get(0));
-        System.out.println("Root  : ");root.display();
-
-        for (Object node : tree.keySet()) {
-            tree.get(node).display();
+        for (String top : nextLevel) {
+            root.addChild(tree.get(top), a.tfidf);
         }
     }
+
 }

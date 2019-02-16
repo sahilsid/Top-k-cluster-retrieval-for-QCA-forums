@@ -27,5 +27,8 @@ class Data {
     public void setSimiliarity(Double similiarity) {
         this.parentSimiliarity = similiarity;
     }
+    public void display(){
+        System.out.print(" " + this.id);
+    }
 
 }
