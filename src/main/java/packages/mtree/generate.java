@@ -19,15 +19,15 @@ public class generate {
 
     public static void main(String[] args) {
         Cluster a = new Cluster(5);
-        Map<String, mtree_beta> tree = new HashMap<String, mtree_beta>();
-        mtree_beta root = new mtree_beta();
+        Map<String, Mtree> tree = new HashMap<String, Mtree>();
+        Mtree root = new Mtree();
         List<String> nextLevel = new ArrayList<String>();
         for (String key : a.clusters.keySet()) {
             nextLevel.add(key);
-            tree.put(key, new mtree_beta(new Data(key)));
+            tree.put(key, new Mtree(new Data(key)));
             for (String children : a.clusters.get(key)) {
                 if (children != key)
-                    tree.get(key).addChild(new mtree_beta(new Data(children)), a.tfidf);
+                    tree.get(key).addChild(new Mtree(new Data(children)), a.tfidf);
             }
         }
         System.out.println("initialized  : ");
@@ -38,7 +38,7 @@ public class generate {
             nextLevel.clear();
             for (String key : a.clusters.keySet()) {
                 nextLevel.add(key+i);
-                tree.put(key+i, new mtree_beta(new Data(key)));
+                tree.put(key+i, new Mtree(new Data(key)));
                 for (String children : a.clusters.get(key)) {
                     if (children != key)
                         tree.get(key+i).addChild(tree.get(children), a.tfidf);

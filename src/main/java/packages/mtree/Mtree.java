@@ -3,24 +3,24 @@ package packages.mtree;
 import java.util.*;
 import packages.textprocess.*;
 
-public class mtree_beta {
+public class Mtree {
 
     private Data data;
-    private List<mtree_beta> children;
-    private mtree_beta parent;
+    private List<Mtree> children;
+    private Mtree parent;
 
-    public mtree_beta() {
+    public Mtree() {
         this.parent = null;
         this.children = new ArrayList<>();
     }
 
-    public mtree_beta(Data data) {
+    public Mtree(Data data) {
         this.parent = null;
         this.children = new ArrayList<>();
         this.data = new Data(data);
     }
 
-    public void addChild(mtree_beta child, Tfidf tfidf) {
+    public void addChild(Mtree child, Tfidf tfidf) {
         if (child == null)
             return;
         child.setParent(this, tfidf);
@@ -30,18 +30,18 @@ public class mtree_beta {
     }
 
     public void addChild(Data data, Tfidf tfidf) {
-        mtree_beta newChild = new mtree_beta(data);
+        Mtree newChild = new Mtree(data);
         this.addChild(newChild, tfidf);
     }
 
-    public void addChildren(List<mtree_beta> children, Tfidf tfidf) {
-        for (mtree_beta t : children) {
+    public void addChildren(List<Mtree> children, Tfidf tfidf) {
+        for (Mtree t : children) {
             t.setParent(this, tfidf);
         }
         this.children.addAll(children);
     }
 
-    public List<mtree_beta> getChildren() {
+    public List<Mtree> getChildren() {
         return children;
     }
 
@@ -53,7 +53,7 @@ public class mtree_beta {
         this.data.updateData(data);
     }
 
-    private void setParent(mtree_beta parent, Tfidf tfidf) {
+    private void setParent(Mtree parent, Tfidf tfidf) {
         if (parent == null)
             return;
         this.parent = parent;
@@ -62,20 +62,24 @@ public class mtree_beta {
     }
 
     public void display() {
-        Queue<mtree_beta> node = new LinkedList<mtree_beta>();
+        Queue<Mtree> node = new LinkedList<Mtree>();
         node.add(this);
+        int i = 0,j=0;
         while (node.size() > 0) {
-            mtree_beta temp = node.remove();
+            Mtree temp = node.remove();
             if (temp != null && temp.data != null)
                 System.out.print("\t"+temp.data.id);
-            for (mtree_beta next : temp.children) {
+            if(i==j){
+
+            }
+            for (Mtree next : temp.children) {
                 if (next != null)
                     node.add(next);
             }
         }
     }
 
-    public mtree_beta getParent() {
+    public Mtree getParent() {
         return parent;
     }
 }
