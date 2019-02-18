@@ -60,7 +60,8 @@ public class Tfidf {
                 if (data.get(qids).contains(word))
                     idf = idf + 1;
             }
-            idf = Math.log(data.size() / idf);
+            tf = tf / keywords.size();
+            idf = 1 + Math.log(data.size() / idf);
             valueMap.replace(key, tf * idf);
         }
         generateSimiliarityMap();
@@ -90,13 +91,12 @@ public class Tfidf {
                     similiarityMap.put(qid1 + "." + qid2, similiarity((String) qid1, (String) qid2));
             }
         }
-        //System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
+        // System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
     }
 
     public Double getSimiliarity(String qid1, String qid2) {
         Double similiarity = 0.0;
-        similiarity = (similiarityMap.containsKey(qid1 + "." + qid2)
-                ? similiarityMap.get(qid1 + "." + qid2)
+        similiarity = (similiarityMap.containsKey(qid1 + "." + qid2) ? similiarityMap.get(qid1 + "." + qid2)
                 : (similiarityMap.containsKey(qid1 + "." + qid2) ? similiarityMap.get(qid2 + "." + qid1) : 0.0));
         return similiarity;
     }
