@@ -28,7 +28,7 @@ class Data {
         this.parentSimiliarity = similiarity;
     }
     public void display(){
-        System.out.print(" " + this.id);
+        System.out.print(" " + this.id + " ( " + this.parentSimiliarity + " ) " );
     }
 
 }

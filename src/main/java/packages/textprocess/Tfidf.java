@@ -60,9 +60,13 @@ public class Tfidf {
                 if (data.get(qids).contains(word))
                     idf = idf + 1;
             }
+            //System.out.println("Word : "+ word + " TF : " + tf +" Idf " + idf);
+
             tf = tf / keywords.size();
             idf = 1 + Math.log(data.size() / idf);
             valueMap.replace(key, tf * idf);
+            //System.out.println("Word c : "+ word + " TF : " + tf*idf +" Idf " + idf);
+
         }
         generateSimiliarityMap();
     }
@@ -70,17 +74,25 @@ public class Tfidf {
     public Double similiarity(String q1, String q2) {
         List<String> common_words = new ArrayList<String>(data.get(q1));
         Double psum = 0.0, i_sum_1 = 0.0, i_sum_2 = 0.0;
-
+        List<String> q1_words = new ArrayList<String>(data.get(q1));
+        List<String> q2_words = new ArrayList<String>(data.get(q2));
+       
+        for (String word : q1_words) {
+            i_sum_1 = i_sum_1 + Math.pow(valueMap.get(q1 + "." + word),2);
+        }
+        for (String word : q2_words) {
+            i_sum_2 = i_sum_2 +  Math.pow(valueMap.get(q2 + "." + word),2);
+        }
         common_words.retainAll(data.get(q2));
+        //System.out.println(q1 + " : " + q2 +" : " +common_words);
 
         for (String common_word : common_words) {
-            i_sum_1 = i_sum_1 + valueMap.get(q1 + "." + common_word);
-            i_sum_2 = i_sum_2 + valueMap.get(q2 + "." + common_word);
-            psum = psum + i_sum_1 * i_sum_2;
+            psum = psum + valueMap.get(q1 + "." + common_word) * valueMap.get(q2 + "." + common_word);
+            //System.out.println(q1+"."+q2 + " : "+ common_word + " : " + valueMap.get(q1 + "." + common_word) +" : " +valueMap.get(q2 + "." + common_word));
         }
         i_sum_1 = Math.sqrt(i_sum_1);
         i_sum_2 = Math.sqrt(i_sum_2);
-
+        
         return (i_sum_1 * i_sum_2 > 0) ? psum / (i_sum_1 * i_sum_2) : 0.0;
     }
 
@@ -91,7 +103,7 @@ public class Tfidf {
                     similiarityMap.put(qid1 + "." + qid2, similiarity((String) qid1, (String) qid2));
             }
         }
-        // System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
+         System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
     }
 
     public Double getSimiliarity(String qid1, String qid2) {

@@ -68,9 +68,10 @@ public class Mtree {
         while (node.size() > 0) {
             Mtree temp = node.remove();
             if (temp != null && temp.data != null)
-                System.out.print("\t"+temp.data.id);
+                temp.data.display();
+                //System.out.print("\t"+temp.data.id);
             if(i==j){
-
+                
             }
             for (Mtree next : temp.children) {
                 if (next != null)
