@@ -7,15 +7,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 public class largeJson {
-    public  void readJsonWithObjectMapper() throws IOException {
+    public static  JsonNode readJsonWithObjectMapper(String path) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode productNode = new ObjectMapper().readTree(new FileInputStream("src/main/resources/android/android_questions.json"));
+        JsonNode productNode = new ObjectMapper().readTree(new FileInputStream(path));
         System.out.println(productNode);
-
-        System.out.println(productNode.get("51829").get("body"));
+        return productNode;
     }
+    
     public static void main(String[] args) throws Exception {
        largeJson a = new largeJson();
-       a.readJsonWithObjectMapper();
     }
 }

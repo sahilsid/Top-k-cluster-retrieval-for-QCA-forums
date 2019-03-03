@@ -5,6 +5,9 @@
 
 package packages.textprocess;
 import java.io.FileReader;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -27,6 +30,9 @@ public class jsonImport {
             e.printStackTrace();
         }
         return jsonObject;
+    }
+    public static JsonNode getjsonlarge(String path) throws Exception {
+        return largeJson.readJsonWithObjectMapper(path);
     }
 
     public static void printJsonObject(JSONObject jsonObj) {
