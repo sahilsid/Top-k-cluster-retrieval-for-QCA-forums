@@ -6,15 +6,16 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
+
 public class largeJson {
     public static  JsonNode readJsonWithObjectMapper(String path) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode productNode = new ObjectMapper().readTree(new FileInputStream(path));
-        System.out.println(productNode);
+        //System.out.println(productNode);
         return productNode;
     }
     
     public static void main(String[] args) throws Exception {
-       largeJson a = new largeJson();
+       JsonNode a =  readJsonWithObjectMapper("src/main/resources/android_questions.json");
     }
 }

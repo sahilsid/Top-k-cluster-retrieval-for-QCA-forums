@@ -5,6 +5,13 @@ import java.awt.Container;
 import java.util.*;
 import javafx.util.Pair;
 import org.json.simple.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * tfidf
@@ -14,26 +21,41 @@ public class Tfidf {
     Map<String, Double> valueMap;
     Map<String, Double> similiarityMap;
     Map<String, List<String>> data;
+    JsonNode questions;
+    List<String> processed;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Tfidf a = new Tfidf();
     }
 
-    public Tfidf() {
+    public Tfidf() throws Exception {
         data = new HashMap<String, List<String>>();
         valueMap = new HashMap<String, Double>();
         similiarityMap = new HashMap<String, Double>();
         Preprocess p = new Preprocess();
-        JSONObject questions = jsonImport.getjson("src/main/resources/android_questions.json");
-        List<String> processed = new ArrayList<String>();
+        questions = jsonImport.getjsonlarge("src/main/resources/android/android_questions.json");
+        processed = new ArrayList<String>();
+        Iterator<String> nodeIterator = questions.fieldNames();
 
-        for (Object key : questions.keySet()) {
-            String k = (String) key;
-            JSONObject value = (JSONObject) questions.get(key);
-            processed = p.keywords((String) value.get("body"));
-            data.put(k, processed);
+        while (nodeIterator.hasNext()) {
+            String key = nodeIterator.next();
+            //System.out.println(key);
+            processed = p.keywords(questions.get(key).get("body").toString());
+            data.put(key, processed);
         }
         initialize();
+    }
+
+    public JsonNode getquestions() {
+        return questions;
+    }
+
+    public Map<String, List<String>> getdata() {
+        return data;
+    }
+
+    public List<String> getprocessedData() {
+        return processed;
     }
 
     void initialize() {
@@ -60,12 +82,12 @@ public class Tfidf {
                 if (data.get(qids).contains(word))
                     idf = idf + 1;
             }
-            //System.out.println("Word : "+ word + " TF : " + tf +" Idf " + idf);
+             System.out.println("Word : "+ word + " TF : " + tf +" Idf " + idf);
 
             tf = tf / keywords.size();
             idf = 1 + Math.log(data.size() / idf);
             valueMap.replace(key, tf * idf);
-            //System.out.println("Word c : "+ word + " TF : " + tf*idf +" Idf " + idf);
+             System.out.println("Word c : "+ word + " TF : " + tf*idf +" Idf " + idf);
 
         }
         generateSimiliarityMap();
@@ -76,23 +98,24 @@ public class Tfidf {
         Double psum = 0.0, i_sum_1 = 0.0, i_sum_2 = 0.0;
         List<String> q1_words = new ArrayList<String>(data.get(q1));
         List<String> q2_words = new ArrayList<String>(data.get(q2));
-       
+
         for (String word : q1_words) {
-            i_sum_1 = i_sum_1 + Math.pow(valueMap.get(q1 + "." + word),2);
+            i_sum_1 = i_sum_1 + Math.pow(valueMap.get(q1 + "." + word), 2);
         }
         for (String word : q2_words) {
-            i_sum_2 = i_sum_2 +  Math.pow(valueMap.get(q2 + "." + word),2);
+            i_sum_2 = i_sum_2 + Math.pow(valueMap.get(q2 + "." + word), 2);
         }
         common_words.retainAll(data.get(q2));
-        //System.out.println(q1 + " : " + q2 +" : " +common_words);
+        // System.out.println(q1 + " : " + q2 +" : " +common_words);
 
         for (String common_word : common_words) {
             psum = psum + valueMap.get(q1 + "." + common_word) * valueMap.get(q2 + "." + common_word);
-            //System.out.println(q1+"."+q2 + " : "+ common_word + " : " + valueMap.get(q1 + "." + common_word) +" : " +valueMap.get(q2 + "." + common_word));
+            // System.out.println(q1+"."+q2 + " : "+ common_word + " : " + valueMap.get(q1 +
+            // "." + common_word) +" : " +valueMap.get(q2 + "." + common_word));
         }
         i_sum_1 = Math.sqrt(i_sum_1);
         i_sum_2 = Math.sqrt(i_sum_2);
-        
+
         return (i_sum_1 * i_sum_2 > 0) ? psum / (i_sum_1 * i_sum_2) : 0.0;
     }
 
@@ -103,7 +126,7 @@ public class Tfidf {
                     similiarityMap.put(qid1 + "." + qid2, similiarity((String) qid1, (String) qid2));
             }
         }
-         System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
+        // System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
     }
 
     public Double getSimiliarity(String qid1, String qid2) {

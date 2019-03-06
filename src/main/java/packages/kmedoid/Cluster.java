@@ -5,6 +5,7 @@ import java.util.*;
 import packages.textprocess.*;
 import org.json.simple.JSONObject;
 import com.google.common.collect.Multimap;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ArrayListMultimap;
 
 /**
@@ -16,13 +17,13 @@ public class Cluster {
     public Multimap<String, String> clusters;
     Map<String, List<String>> data;
     List<String> centroids;
-    JSONObject questions;
+    JsonNode questions;
     Preprocess p;
     List<String> processed;
 
     public Tfidf tfidf;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Cluster a = new Cluster(4);
         List<String> qids = new ArrayList<String>();
 
@@ -30,73 +31,63 @@ public class Cluster {
             qids.add(k);
 
         a.displaydata();
-        a.reinitialize(qids,2);
         // a.initialize();
     }
 
-    public Cluster(int a) {
+    public Cluster(int a) throws Exception {
         k = a;
         clusters = ArrayListMultimap.create();
         data = new HashMap<String, List<String>>();
-        tfidf = new Tfidf();
-        p = new Preprocess();
-        questions = jsonImport.getjson("src/main/resources/android_questions.json");
-        processed = new ArrayList<String>();
 
-        for (Object key : questions.keySet()) {
-            String k = (String) key;
-            JSONObject value = (JSONObject) questions.get(key);
-            processed = p.keywords((String) value.get("body"));
-            data.put(k, processed);
-        }
+        tfidf = new Tfidf();
+        System.out.println("c  : ");
+
+        p = new Preprocess();
+        questions = tfidf.getquestions();
+        processed = new ArrayList<String>();
+        data = tfidf.getdata();
         initialize();
         while (formNewCentroids()) {
-    //        System.out.println("New Centroids :  " + centroids);
+            System.out.println(".New Centroids : " + centroids);
             clusterize();
         }
     }
 
-    public void reinitialize(int a){
-        
+    public void reinitialize(int a) {
+
         processed.clear();
         centroids.clear();
         clusters.clear();
-        this.k=a;
-
-        for (Object key : questions.keySet()) {
-            String k = (String) key;
-            JSONObject value = (JSONObject) questions.get(key);
-            processed = p.keywords((String) value.get("body"));
-            data.put(k, processed);
-        }
+        this.k = a;
         initialize();
         while (formNewCentroids()) {
-    //        System.out.println("New Centroids :  " + centroids);
+            // System.out.println("New Centroids : " + centroids);
             clusterize();
         }
 
     }
 
-    public void reinitialize(List<String> newqids,int no) {
-    //    System.out.println("New cluster size :  " + no);
+    public void reinitialize(List<String> newqids, int no) {
+        // System.out.println("New cluster size : " + no);
 
         processed.clear();
         data.clear();
         centroids.clear();
         clusters.clear();
-        this.k=no;
+        this.k = no;
 
-        for (Object key : questions.keySet()) {
-            String k = (String) key;
-            JSONObject value = (JSONObject) questions.get(key);
-            if (newqids.contains(k)) {
-                processed = p.keywords((String) value.get("body"));
-                data.put(k, processed);
+        Iterator<String> nodeIterator = questions.fieldNames();
+
+        while (nodeIterator.hasNext()) {
+            String key = nodeIterator.next();
+            if (newqids.contains(key)) {
+                processed = p.keywords(questions.get(key).get("body").toString());
+                data.put(key, processed);
             }
         }
         initialize();
         while (formNewCentroids()) {
-    //        System.out.println("New Centroids :  " + centroids);
+            // System.out.println("New Centroids : " + centroids);
             clusterize();
         }
     }
@@ -111,12 +102,12 @@ public class Cluster {
             }
             centroids.add((String) randomkey);
         }
-    //    System.out.println("Random Keys" + centroids);
+        // System.out.println("Random Keys" + centroids);
         clusterize();
         List<String> temp = new ArrayList<String>(clusters.keySet());
         for (String var : temp) {
-            if(clusters.get(var).size()==1)
-                this.reinitialize(this.k-1);
+            if (clusters.get(var).size() == 1)
+                this.reinitialize(this.k - 1);
         }
     }
 
@@ -142,8 +133,8 @@ public class Cluster {
         // System.out.println("Clusters : ");
 
         // for (Object k : clusters.keySet()) {
-        //     System.out.print(k + "      : \t");
-        //     System.out.println(clusters.get((String) k));
+        // System.out.print(k + " : \t");
+        // System.out.println(clusters.get((String) k));
         // }
     }
 
@@ -157,13 +148,13 @@ public class Cluster {
         }
         for (String centroid : tempCentroid) {
             max = -1.0;
-    //        System.out.println(" Cluster  : " + centroid);
+            // System.out.println(" Cluster : " + centroid);
             for (String node : clusters.get(centroid)) {
                 similiarity = 0.0;
                 for (String clusterNeighbour : clusters.get(centroid)) {
                     similiarity = similiarity + tfidf.similiarity(node, clusterNeighbour);
                 }
-    //            System.out.println("\t node  : " + node + " \t \t DistSum : " + similiarity);
+                // System.out.println("\t node : " + node + " \t \t DistSum : " + similiarity);
 
                 // System.out.println(" node : " + node + " similiarity sum : " + similiarity +
                 // " max
@@ -180,7 +171,7 @@ public class Cluster {
                 centroids.add(medoid);
             }
         }
-    //    System.out.println("New Centroids :  " + centroids);
+        // System.out.println("New Centroids : " + centroids);
 
         return centroid_change;
     }

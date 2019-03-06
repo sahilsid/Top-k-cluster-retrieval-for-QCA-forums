@@ -17,8 +17,9 @@ import com.google.common.collect.ArrayListMultimap;
  */
 public class generate {
 
-    public static void main(String[] args) {
-        Cluster a = new Cluster(5);
+    public static void main(String[] args) throws Exception{
+        Cluster a = new Cluster(100);
+        System.out.println("hi  : ");
         Map<String, Mtree> tree = new HashMap<String, Mtree>();
         Mtree root = new Mtree();
         List<String> nextLevel = new ArrayList<String>();
@@ -50,7 +51,7 @@ public class generate {
         for (String top : nextLevel) {
             root.addChild(tree.get(top), a.tfidf);
         }
-        root.display();
+        root.displaytree();
     }
 
 }
