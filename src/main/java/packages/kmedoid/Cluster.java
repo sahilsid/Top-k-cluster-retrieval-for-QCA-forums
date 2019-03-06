@@ -20,7 +20,6 @@ public class Cluster {
     JsonNode questions;
     Preprocess p;
     List<String> processed;
-
     public Tfidf tfidf;
 
     public static void main(String[] args) throws Exception {

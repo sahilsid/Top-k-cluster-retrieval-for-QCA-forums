@@ -18,6 +18,9 @@ class Data {
     public Data getData() {
         return this;
     }
+    public String getDataQid() {
+        return this.id;
+    }
 
     public void updateData(Data data) {
         this.id = data.id;
