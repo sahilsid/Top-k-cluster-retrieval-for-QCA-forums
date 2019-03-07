@@ -41,7 +41,7 @@ public class Tfidf {
 
         while (nodeIterator.hasNext()) {
             String key = nodeIterator.next();
-            //System.out.println(key);
+            // System.out.println(key);
             processed = p.keywords(questions.get(key).get("body").toString());
             data.put(key, processed);
         }
@@ -85,14 +85,16 @@ public class Tfidf {
                 if (data.get(qids).contains(word))
                     idf = idf + 1;
             }
-//            System.out.println("Word : "+ word + " TF : " + tf +" Idf " + idf);
+            // System.out.println("Word : "+ word + " TF : " + tf +" Idf " + idf);
 
             tf = tf / keywords.size();
             idf = 1 + Math.log(data.size() / idf);
-            valueMap.replace(key, tf * idf);
-            idfMap.replace(key,idf);
+            // System.out.println("Word : "+ word + " TF : " + tf +" Idf " + idf);
 
-//            System.out.println("Word c : "+ word + " TF : " + tf*idf +" Idf " + idf);
+            valueMap.replace(key, tf * idf);
+            idfMap.replace(word, idf);
+
+            // System.out.println("Word c : "+ word + " TF : " + tf*idf +" Idf " + idf);
 
         }
         generateSimiliarityMap();
@@ -131,25 +133,33 @@ public class Tfidf {
                     similiarityMap.put(qid1 + "." + qid2, similiarity((String) qid1, (String) qid2));
             }
         }
-        // System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
+        System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
+        // System.out.println("Idf Map Generated : \n \t" + idfMap);
+
     }
 
     public Double getSimiliarity(String qid1, String qid2) {
         Double similiarity = 0.0;
         similiarity = (similiarityMap.containsKey(qid1 + "." + qid2) ? similiarityMap.get(qid1 + "." + qid2)
-                : (similiarityMap.containsKey(qid1 + "." + qid2) ? similiarityMap.get(qid2 + "." + qid1) : 0.0));
+                : (similiarityMap.containsKey(qid2 + "." + qid1) ? similiarityMap.get(qid2 + "." + qid1) : 0.0));
+        similiarity = similiarity > 1 ? 1 : similiarity;
         return similiarity;
     }
+
     public Double getdistance(String qid1, String qid2) {
         Double similiarity = 0.0;
-        similiarity = (similiarityMap.containsKey(qid1 + "." + qid2) ? similiarityMap.get(qid1 + "." + qid2)
-                : (similiarityMap.containsKey(qid1 + "." + qid2) ? similiarityMap.get(qid2 + "." + qid1) : 0.0));
-        Double distance = 2 * Math.acos(similiarity);
-        return distance;
+        if (similiarityMap.containsKey(qid1 + "." + qid2))
+            similiarity = similiarityMap.get(qid1 + "." + qid2);
+        else if (similiarityMap.containsKey(qid2 + "." + qid1))
+            similiarity = similiarityMap.get(qid2 + "." + qid1);
+
+        System.out.println(" Similiarity " + qid1 + " : " + qid2 + " : " + similiarity);
+        similiarity = similiarity > 1 ? 1 : similiarity;
+        return 2 * Math.acos(similiarity);
     }
 
-    public Double getquerydistance(String qid, String query){
-                
+    public Double getquerydistance(String qid, String query) {
+
         Double distance = 0.0;
         Preprocess p = new Preprocess();
         List<String> common_words = new ArrayList<String>(p.keywords(questions.get(qid).get("body").toString()));
@@ -164,29 +174,29 @@ public class Tfidf {
             i_sum_1 = i_sum_1 + Math.pow(valueMap.get(qid + "." + word), 2);
         }
         for (String word : q2_words) {
-            
+
             tf_query = tf_query + Collections.frequency(q2_words, word);
             tf_query = tf_query / q2_words.size();
 
             idf_query = idfMap.get(word);
-            i_sum_2 = i_sum_2 + Math.pow(tf_query*idf_query, 2);
+            i_sum_2 = i_sum_2 + Math.pow(tf_query * idf_query, 2);
         }
+
         common_words.retainAll(q2_words);
-        // System.out.println(q1 + " : " + q2 +" : " +common_words);
 
         for (String common_word : common_words) {
             tf_query = tf_query + Collections.frequency(q2_words, common_word);
             tf_query = tf_query / q2_words.size();
 
             idf_query = idfMap.get(common_word);
-            psum = psum + valueMap.get(qid + "." + common_word) *(tf_query*idf_query);
+            psum = psum + (valueMap.get(qid + "." + common_word) * (tf_query * idf_query));
             // System.out.println(q1+"."+q2 + " : "+ common_word + " : " + valueMap.get(q1 +
             // "." + common_word) +" : " +valueMap.get(q2 + "." + common_word));
         }
         i_sum_1 = Math.sqrt(i_sum_1);
         i_sum_2 = Math.sqrt(i_sum_2);
 
-        distance = (i_sum_1 * i_sum_2 > 0) ? 2*Math.acos(psum / (i_sum_1 * i_sum_2)) : 2*Math.acos(0.0);
+        distance = (i_sum_1 * i_sum_2 > 0) ? 2 * Math.acos(psum / (i_sum_1 * i_sum_2)) : 2 * Math.acos(0.0);
         return distance;
     }
 }

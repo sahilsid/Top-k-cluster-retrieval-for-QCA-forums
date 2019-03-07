@@ -110,7 +110,7 @@ public class Mtree {
                 Mtree temp = parent.remove();
                 if (temp != null && temp.data != null) {
                     temp.data.display();
-                    System.out.print("("); temp.parent.display(); System.out.println(  ") ");
+                     System.out.print("("); temp.childrenDisplay(); System.out.println(  ") ");
                 }
                 // System.out.print("\t"+temp.data.id);
 
@@ -129,8 +129,18 @@ public class Mtree {
         }
     }
 
+    public void childrenDisplay() {
+      for(Mtree a : this.children){
+          if(a!=null  && a.data!=null)
+            a.data.display();
+      }
+    }
+    public void dataDisplay() {
+            if(this!=null  && this.data!=null)
+              this.data.display();
+      }
     public Boolean isLeaf() {
-        return this.radius==0.0;
+        return this.children.getLast()!=null ? this.children.getLast().radius==0.0 : true;
     }
 
     public Mtree getParent() {
