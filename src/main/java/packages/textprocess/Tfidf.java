@@ -3,7 +3,6 @@ package packages.textprocess;
 
 import java.awt.Container;
 import java.util.*;
-import javafx.util.Pair;
 import org.json.simple.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
