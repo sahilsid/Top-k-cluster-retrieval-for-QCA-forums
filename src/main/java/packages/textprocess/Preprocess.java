@@ -32,9 +32,9 @@ public class Preprocess {
             String key = nodeIterator.next();
             System.out.println(key); 
             if( questions.get(key).get("answers").isArray()){
-                Iterator nodeIterator2 = questions.get(key).get("answers").elements();
+                Iterator<JsonNode> nodeIterator2 = questions.get(key).get("answers").elements();
                 while(nodeIterator2.hasNext()){
-                    Object val =  nodeIterator2.next();
+                    String  val =  nodeIterator2.next().asText();
                     System.out.println(val);
                 }
             }
