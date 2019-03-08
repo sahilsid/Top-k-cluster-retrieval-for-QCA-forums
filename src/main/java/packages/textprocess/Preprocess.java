@@ -30,18 +30,15 @@ public class Preprocess {
 
         while(nodeIterator.hasNext()){
             String key = nodeIterator.next();
-            //System.out.println(key); 
-            //System.out.println( questions.get(key).get("body").toString());
-            // processed = p.keywords((String)value.get("body"));
+            System.out.println(key); 
+            if( questions.get(key).get("answers").isArray()){
+                Iterator nodeIterator2 = questions.get(key).get("answers").elements();
+                while(nodeIterator2.hasNext()){
+                    Object val =  nodeIterator2.next();
+                    System.out.println(val);
+                }
+            }
 
-            // System.out.print ("\n\nQ Id : " + k + " \t ");
-
-            // System.out.print("Keywords : [ " );
-            // for (String id : processed) {
-            //     System.out.print(id);
-            //     System.out.print(" , ");
-            // }
-            // System.out.print(" ]");
 
         }
 
