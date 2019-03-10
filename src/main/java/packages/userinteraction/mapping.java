@@ -30,18 +30,23 @@ public class mapping{
         m.mapUidAns();
         m.mapUidQaid();
         m.mapUidUid();
-        m.sort_UidUid_commonQs();
+
+       // m.sort_UidUid_commonQs();
     }
     public mapping() throws Exception{
-
+        this.mapAnsQn();
+        this.mapUidQn();
+        this.mapUidAns();
+        this.mapUidQaid();
+        this.mapUidUid();
     }  
 
-       void mapAnsQn(){
+       public void mapAnsQn(){
             AidQid = new HashMap<String, String>();
             Iterator<String> nodeIterator = answers.fieldNames();
             while (nodeIterator.hasNext()) {
                 String key = nodeIterator.next();
-                AidQid.put(key, answers.get(key).get("parentid").toString());
+                AidQid.put(key, answers.get(key).get("parentid").asText());
             }
             // for (Object aid : answers.keySet()) {
             //     JSONObject value = (JSONObject) answers.get(aid);
@@ -51,7 +56,7 @@ public class mapping{
            // System.out.println(AidQid);
 
         }
-        void mapUidQn(){
+        public void mapUidQn(){
             UidQid = new HashMap<String, List<String>>();
             Iterator<String> nodeIterator = users.fieldNames();
             // for (Object uid : users.keySet()) {
@@ -70,11 +75,11 @@ public class mapping{
                 questionids.add(val);
                 }
                 UidQid.put(key, new LinkedList<String>( questionids));
-                System.out.println(UidQid.get(key)); 
+            //    System.out.println(UidQid.get(key)); 
             }
             //System.out.println(UidQid);
         }
-        void mapUidAns(){
+        public void mapUidAns(){
             UidAid = new HashMap<String, List<String>>();
             Iterator<String> nodeIterator = users.fieldNames();
             // for (Object uid : users.keySet()) {
@@ -93,13 +98,13 @@ public class mapping{
                 answerids.add(val);
                 }
                 UidAid.put(key, new LinkedList<String>(answerids));
-                System.out.println(UidAid.get(key)); 
+              //  System.out.println(UidAid.get(key)); 
 
             }
             //System.out.println(UidAid);
       
         }
-        void mapUidQaid(){
+        public void mapUidQaid(){
             UidQaid = new HashMap<String, List<String>>();
             List<String> ans_list=new LinkedList<String>();;
             List<String> qid_list = new LinkedList<String>();
@@ -114,14 +119,14 @@ public class mapping{
                     // System.out.println("user : "+ uid+" : "  + qid_list);
 
                     UidQaid.put((String)uid, new LinkedList<String>(qid_list));
-                    System.out.println("QAID"+UidQaid.get(uid)); 
+                   // System.out.println("QAID"+UidQaid.get(uid)); 
 
                     qid_list.clear();
                 }  
             }
             //System.out.println(UidQaid);
         }
-        void mapUidUid(){
+        public void mapUidUid(){
             UidUid = new HashMap<String, List<String>>();
             UidUid_commonQs = new HashMap<String, Integer>();
             UidUid_commonQs_sorted=new HashMap<String, Integer>();
@@ -133,25 +138,31 @@ public class mapping{
                     if (uid1 != uid2 && (!UidUid_commonQs.containsKey(uid2+"."+uid1)) && (!UidUid_commonQs.containsKey(uid1+"."+uid2))){
                         LinkedList<String> l1 = new LinkedList<String>(UidQid.get(uid1));//qid's 
                         LinkedList<String> l2 = new LinkedList<String>(UidQid.get(uid2));
-                         System.out.println("QAID OF USER2"+UidQaid.get(uid2));
+                       
                         if(UidQaid.containsKey(uid1)){
                             LinkedList<String> ql1 = new LinkedList<String>(UidQaid.get(uid1));//Qaid
                             LinkedList<String> temp2 = new LinkedList<String>(l2);
                             temp2.retainAll(ql1);
-                            System.out.println("COMMON QAID OF USER2"+temp2);
-
+                            
                             if(temp2.size()>0)
                              {
+                                // System.out.println("COMMON QAID OF USER2"+temp2);
+
                                 interact_Qid.add((String)uid2);
                                 count_common_ques=count_common_ques+temp2.size();
                              }       
                         }
                         if(UidQaid.containsKey(uid2)){
+                            
                             LinkedList<String> ql2 = new LinkedList<String>(UidQaid.get(uid2));
                             LinkedList<String> temp = new LinkedList<String>(l1);
                             //temp.addAll(l1);// if we use l1, it will be modified
+
                             temp.retainAll(ql2);
+
                             if(temp.size()>0){
+                                // System.out.println("COMMON QAID OF USER2"+temp);
+
                                 if(!interact_Qid.contains(uid2))
                                 {
                                    interact_Qid.add((String)uid2);
@@ -172,15 +183,15 @@ public class mapping{
                     }   
                 } 
                 UidUid.put((String)uid1, new LinkedList<String>(interact_Qid));
-                System.out.println("uid-uid"+UidUid.get(uid1));
+                //System.out.println("uid-uid"+UidUid.get(uid1));
 
                 interact_Qid .clear();
                 count_common_ques=0;       
             }
-            System.out.println("uid-uid"+UidUid);
+            //System.out.println("uid-uid"+UidUid);
             //System.out.println(UidUid_commonQs);
         }
-        void sort_UidUid_commonQs(){
+        public void sort_UidUid_commonQs(){
             
             List<Integer>sorted_value_list= new LinkedList<Integer>( UidUid_commonQs.values());
             Collections.sort(sorted_value_list);

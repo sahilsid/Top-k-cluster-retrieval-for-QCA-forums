@@ -1,10 +1,6 @@
 package packages.query;
 
 import java.awt.List;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.*;
 import packages.mtree.Mtree;
 import packages.textprocess.Tfidf;
@@ -17,19 +13,19 @@ public class loadRelevantQuestions {
     Mtree root;
     Double searchRadius;
     String query;
-    LinkedList<String> relevantQuestions;
+    Map<String,Double> relevantQuestions;
     Tfidf tfidf;
 
     public loadRelevantQuestions(Mtree r, Double search, String Query, Tfidf tfidf_) {
         this.root = r;
         this.searchRadius = search;
         this.query = Query;
-        this.relevantQuestions = new LinkedList<String>();
+        this.relevantQuestions = new HashMap<String,Double>();
         this.tfidf = tfidf_;
         load();
     }
 
-    public LinkedList<String> getRelevantQids() {
+    public Map<String,Double> getRelevantQids() {
         return relevantQuestions;
     }
 
@@ -56,8 +52,9 @@ public class loadRelevantQuestions {
 
                 for (Mtree child : node.getChildren()) {
                     if (queryDistance - tfidf.getdistance(node.getQid(), child.getQid()) < searchRadius) {
-                        if (tfidf.getquerydistance(child.getQid(), query) < searchRadius) {
-                            relevantQuestions.add(child.getQid());
+                        Double dist = tfidf.getquerydistance(child.getQid(), query);
+                        if (dist < searchRadius) {
+                            relevantQuestions.put(child.getQid(),dist);
                         }
                     }
                 }
@@ -67,7 +64,8 @@ public class loadRelevantQuestions {
                     System.out.println(" query dist :  "+queryDistance + " Parent dist : " + tfidf.getdistance(node.getQid(), child.getQid() )+ " Noderadius : "+ node.getRadius());
                     if (queryDistance - tfidf.getdistance(node.getQid(), child.getQid()) < searchRadius
                             + node.getRadius()) {
-                        if (tfidf.getquerydistance(child.getQid(), query) < searchRadius + node.getRadius()) {
+                        Double dist = tfidf.getquerydistance(child.getQid(), query);
+                        if (dist < searchRadius + node.getRadius()) {
                             queue.add(child);
                         }
                     }

@@ -3,6 +3,8 @@ package packages.textprocess;
 
 import java.awt.Container;
 import java.util.*;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Map;
+import java.io.*;
 
 /**
  * tfidf
@@ -21,6 +23,7 @@ public class Tfidf {
     Map<String, Double> idfMap;
     Map<String, Double> similiarityMap;
     Map<String, List<String>> data;
+    Map<String,Pair<String,Integer>> ifrequency;
     JsonNode questions;
     List<String> processed;
 
@@ -31,19 +34,22 @@ public class Tfidf {
     public Tfidf() throws Exception {
         data = new HashMap<String, List<String>>();
         valueMap = new HashMap<String, Double>();
+        ifrequency = new HashMap<String,Pair<String,Integer>>();
         idfMap = new HashMap<String, Double>();
         similiarityMap = new HashMap<String, Double>();
         Preprocess p = new Preprocess();
-        questions = jsonImport.getjsonlarge("src/main/resources/android_questions.json");
-        processed = new ArrayList<String>();
+        questions = jsonImport.getjsonlarge("src/main/resources/android/android_questions.json");
+        processed = new LinkedList<String>();
         Iterator<String> nodeIterator = questions.fieldNames();
-
+        int count =0;
         while (nodeIterator.hasNext()) {
+            count++;
             String key = nodeIterator.next();
-            // System.out.println(key);
+            System.out.println(count+" . "+key);
             processed = p.keywords(questions.get(key).get("body").toString());
             data.put(key, processed);
         }
+
         initialize();
     }
 
@@ -59,31 +65,43 @@ public class Tfidf {
         return processed;
     }
 
-    void initialize() {
+    void initialize() throws Exception {
         for (String qid : data.keySet()) {
             for (String keywords : data.get(qid)) {
                 valueMap.putIfAbsent(qid + "." + keywords, 0.0);
                 idfMap.putIfAbsent(keywords, 0.0);
+                if(ifrequency.containsKey(keywords)){
+                    Pair<String,Integer> lastAdded = ifrequency.get(keywords);
+                    if(lastAdded.getLeft()!=qid){
+                        Pair<String,Integer> newAdded = Pair.of(qid, lastAdded.getRight()+1);
+                        ifrequency.replace(keywords,newAdded);
+                    }
+                }
+                else{
+                    ifrequency.put(keywords, Pair.of(qid, 1));                    
+                }
             }
         }
+        System.out.println(valueMap.size() + "\n " + ifrequency);
+
         assignTfIdf();
     }
 
-    void assignTfIdf() {
+    void assignTfIdf() throws Exception{
+        Double tf, idf,count=0.0;
         for (String key : valueMap.keySet()) {
             StringTokenizer token = new StringTokenizer(key, ".");
             String qid = token.nextToken();
             String word = token.nextToken();
-            Double tf, idf;
             tf = 0.0;
             idf = 0.0;
             List<String> keywords = data.get(qid);
             tf = tf + Collections.frequency(keywords, word);
 
-            for (String qids : data.keySet()) {
-                if (data.get(qids).contains(word))
-                    idf = idf + 1;
-            }
+            idf = idf + ifrequency.get(word).getRight();
+            count++;
+            System.out.println(count +  " : "  + key);
+
             // System.out.println("Word : "+ word + " TF : " + tf +" Idf " + idf);
 
             tf = tf / keywords.size();
@@ -96,14 +114,16 @@ public class Tfidf {
             // System.out.println("Word c : "+ word + " TF : " + tf*idf +" Idf " + idf);
 
         }
+        System.out.println("Assigned");
+
         generateSimiliarityMap();
     }
 
     public Double similiarity(String q1, String q2) {
-        List<String> common_words = new ArrayList<String>(data.get(q1));
+        List<String> common_words = new LinkedList<String>(data.get(q1));
         Double psum = 0.0, i_sum_1 = 0.0, i_sum_2 = 0.0;
-        List<String> q1_words = new ArrayList<String>(data.get(q1));
-        List<String> q2_words = new ArrayList<String>(data.get(q2));
+        List<String> q1_words = new LinkedList<String>(data.get(q1));
+        List<String> q2_words = new LinkedList<String>(data.get(q2));
 
         for (String word : q1_words) {
             i_sum_1 = i_sum_1 + Math.pow(valueMap.get(q1 + "." + word), 2);
@@ -125,13 +145,25 @@ public class Tfidf {
         return (i_sum_1 * i_sum_2 > 0) ? psum / (i_sum_1 * i_sum_2) : 0.0;
     }
 
-    void generateSimiliarityMap() {
+    void generateSimiliarityMap() throws Exception {
+        int count=0;
         for (Object qid1 : data.keySet()) {
+            
             for (Object qid2 : data.keySet()) {
-                if (!similiarityMap.containsKey(qid1 + "." + qid2) && !similiarityMap.containsKey(qid2 + "." + qid1))
+                if (!similiarityMap.containsKey(qid1 + "." + qid2) && !similiarityMap.containsKey(qid2 + "." + qid1)){
+                    count++;
                     similiarityMap.put(qid1 + "." + qid2, similiarity((String) qid1, (String) qid2));
+                    System.out.println(count+" Adding Similiarity : \n \t" + qid1 +" : "+qid2);
+                }
             }
         }
+        Properties properties = new Properties();
+
+for (Map.Entry<String,Double> entry : similiarityMap.entrySet()) {
+    properties.put(entry.getKey(), ""+ entry.getValue()+"");
+}
+
+    properties.store(new FileOutputStream("./src/main/resources/offlineResults/similiarityMap.properties"), null);
         System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
         // System.out.println("Idf Map Generated : \n \t" + idfMap);
 
@@ -161,10 +193,10 @@ public class Tfidf {
 
         Double distance = 0.0;
         Preprocess p = new Preprocess();
-        List<String> common_words = new ArrayList<String>(p.keywords(questions.get(qid).get("body").toString()));
+        List<String> common_words = new LinkedList<String>(p.keywords(questions.get(qid).get("body").toString()));
         Double psum = 0.0, i_sum_1 = 0.0, i_sum_2 = 0.0;
-        List<String> q1_words = new ArrayList<String>(p.keywords(questions.get(qid).get("body").toString()));
-        List<String> q2_words = new ArrayList<String>(p.keywords(query));
+        List<String> q1_words = new LinkedList<String>(p.keywords(questions.get(qid).get("body").toString()));
+        List<String> q2_words = new LinkedList<String>(p.keywords(query));
 
         Double tf_query, idf_query;
         tf_query = 0.0;
