@@ -26,7 +26,7 @@ public class Tfidf {
     Map<String,Pair<String,Integer>> ifrequency;
     Map<String,Integer> indexMap;
     JsonNode questions;
-    Float similiarityMatrix[][];
+    Double similiarityMatrix[][];
     List<String> processed;
 
     public static void main(String[] args) throws Exception {
@@ -55,7 +55,7 @@ public class Tfidf {
 
         }
 
-        similiarityMatrix = new Float[data.size()][data.size()];
+        similiarityMatrix = new Double[data.size()][data.size()];
         initialize();
     }
 
@@ -126,7 +126,7 @@ public class Tfidf {
     }
 
 
-    public Float similiarity(String q1, String q2) {
+    public Double similiarity(String q1, String q2) {
         List<String> common_words = new LinkedList<String>(data.get(q1));
         Double psum = 0.0, i_sum_1 = 0.0, i_sum_2 = 0.0;
         List<String> q1_words = new LinkedList<String>(data.get(q1));
@@ -149,7 +149,7 @@ public class Tfidf {
         i_sum_1 = Math.sqrt(i_sum_1);
         i_sum_2 = Math.sqrt(i_sum_2);
 
-        return (float) ((i_sum_1 * i_sum_2 > 0) ? psum / (i_sum_1 * i_sum_2) : 0.0f);
+        return (Double) ((i_sum_1 * i_sum_2 > 0) ? psum / (i_sum_1 * i_sum_2) : 0.0f);
     }
 
     void generateSimiliarityMap() throws Exception {
