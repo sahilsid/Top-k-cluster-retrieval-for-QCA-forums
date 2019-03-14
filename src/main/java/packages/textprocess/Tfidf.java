@@ -88,11 +88,7 @@ public class Tfidf {
                 }
             }
         }
-<<<<<<< Updated upstream
-        //System.out.println(valueMap.size() + "\n " + data.size());
-=======
         //System.out.println(valueMap.size() + "\n " + ifrequency);
->>>>>>> Stashed changes
 
         assignTfIdf();
     }
@@ -161,20 +157,12 @@ public class Tfidf {
         for (Object qid1 : data.keySet()) {
             
             for (Object qid2 : data.keySet()) {
-<<<<<<< Updated upstream
                 // if (!similiarityMap.containsKey(qid1 + "." + qid2) && !similiarityMap.containsKey(qid2 + "." + qid1)){
                 //     count++;
                 //     similiarityMap.put(qid1 + "." + qid2, similiarity((String) qid1, (String) qid2));
                 //     System.out.println(count+" Adding Similiarity : \n \t" + qid1 +" : "+qid2);
                 // }
                 similiarityMatrix[indexMap.get(qid1)][indexMap.get(qid2)] = (similiarity((String) qid1, (String) qid2));
-=======
-                if (!similiarityMap.containsKey(qid1 + "." + qid2) && !similiarityMap.containsKey(qid2 + "." + qid1)){
-                    count++;
-                    similiarityMap.put(qid1 + "." + qid2, similiarity((String) qid1, (String) qid2));
-                    //System.out.println(count+" Adding Similiarity : \n \t" + qid1 +" : "+qid2);
-                }
->>>>>>> Stashed changes
             }
         }
         Properties properties = new Properties();
