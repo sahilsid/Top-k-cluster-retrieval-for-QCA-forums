@@ -29,7 +29,7 @@ public class Mtree {
             return;
         child.setParent(this, tfidf);
         if (child.data != null && this.data != null)
-            System.out.println("Setting parent of " + child.data.id + " to " + this.data.id);
+            //System.out.println("Setting parent of " + child.data.id + " to " + this.data.id);
         this.children.add(child);
     }
 
@@ -70,8 +70,8 @@ public class Mtree {
         this.parent = parent;
         if (parent.data != null) {
             this.data.setSimiliarity(tfidf.similiarity(parent.data.id, this.data.id));
-            if (parent.maxDistanceChild < 2 * Math.acos(tfidf.similiarity(parent.data.id, this.data.id))) {
-                parent.maxDistanceChild = 2 * Math.acos(tfidf.similiarity(parent.data.id, this.data.id));
+            if (parent.maxDistanceChild < 2 * Math.acos(tfidf.similiarity(parent.data.id, this.data.id))+this.radius) {
+                parent.maxDistanceChild = 2 * Math.acos(tfidf.similiarity(parent.data.id, this.data.id)+this.radius);
                 parent.radius = this.radius + parent.maxDistanceChild;
             }
         }
@@ -103,14 +103,14 @@ public class Mtree {
         parent.add(this);
         int i = 0, j = 0;
         while (parent.size() > 0) {
-            System.out.print("\n Level : " + i + " :\t  ");
+            //System.out.print("\n Level : " + i + " :\t  ");
 
             while (parent.size() > 0) {
 
                 Mtree temp = parent.remove();
                 if (temp != null && temp.data != null) {
                     temp.data.display();
-                     System.out.print("("); temp.childrenDisplay(); System.out.println(  ") ");
+                     //System.out.print("("); temp.childrenDisplay(); System.out.println(  ") ");
                 }
                 // System.out.print("\t"+temp.data.id);
 
@@ -124,7 +124,7 @@ public class Mtree {
                 if (temp != null)
                     parent.add(temp);
             }
-            System.out.println("\n_____________________________________________________________________");
+            //System.out.println("\n_____________________________________________________________________");
             i++;
         }
     }

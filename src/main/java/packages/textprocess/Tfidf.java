@@ -47,7 +47,7 @@ public class Tfidf {
         int count =0;
         while (nodeIterator.hasNext()) {
             String key = nodeIterator.next();
-            System.out.println(count+" . "+key);
+            //System.out.println(count+" . "+key);
             processed = p.keywords(questions.get(key).get("body").toString());
             data.put(key, processed);
             indexMap.put(key, count);
@@ -88,7 +88,11 @@ public class Tfidf {
                 }
             }
         }
+<<<<<<< Updated upstream
         //System.out.println(valueMap.size() + "\n " + data.size());
+=======
+        //System.out.println(valueMap.size() + "\n " + ifrequency);
+>>>>>>> Stashed changes
 
         assignTfIdf();
     }
@@ -106,7 +110,7 @@ public class Tfidf {
 
             idf = idf + ifrequency.get(word).getRight();
             count++;
-            System.out.println(count +  " : "  + key);
+            //System.out.println(count +  " : "  + key);
 
             // System.out.println("Word : "+ word + " TF : " + tf +" Idf " + idf);
 
@@ -120,7 +124,7 @@ public class Tfidf {
             // System.out.println("Word c : "+ word + " TF : " + tf*idf +" Idf " + idf);
 
         }
-        System.out.println("Assigned");
+        //System.out.println("Assigned");
 
         generateSimiliarityMap();
     }
@@ -157,12 +161,20 @@ public class Tfidf {
         for (Object qid1 : data.keySet()) {
             
             for (Object qid2 : data.keySet()) {
+<<<<<<< Updated upstream
                 // if (!similiarityMap.containsKey(qid1 + "." + qid2) && !similiarityMap.containsKey(qid2 + "." + qid1)){
                 //     count++;
                 //     similiarityMap.put(qid1 + "." + qid2, similiarity((String) qid1, (String) qid2));
                 //     System.out.println(count+" Adding Similiarity : \n \t" + qid1 +" : "+qid2);
                 // }
                 similiarityMatrix[indexMap.get(qid1)][indexMap.get(qid2)] = (similiarity((String) qid1, (String) qid2));
+=======
+                if (!similiarityMap.containsKey(qid1 + "." + qid2) && !similiarityMap.containsKey(qid2 + "." + qid1)){
+                    count++;
+                    similiarityMap.put(qid1 + "." + qid2, similiarity((String) qid1, (String) qid2));
+                    //System.out.println(count+" Adding Similiarity : \n \t" + qid1 +" : "+qid2);
+                }
+>>>>>>> Stashed changes
             }
         }
         Properties properties = new Properties();
@@ -172,7 +184,7 @@ for (Map.Entry<String,Double> entry : similiarityMap.entrySet()) {
 }
 
     properties.store(new FileOutputStream("./src/main/resources/offlineResults/similiarityMap.properties"), null);
-        System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
+        //System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
         // System.out.println("Idf Map Generated : \n \t" + idfMap);
 
     }
@@ -199,7 +211,7 @@ for (Map.Entry<String,Double> entry : similiarityMap.entrySet()) {
         similiarity = (indexMap.containsKey(qid1)&&indexMap.containsKey(qid2) ?  similiarityMatrix[indexMap.get(qid1)][indexMap.get(qid2)] : 0.0);
 
 
-        System.out.println(" Similiarity " + qid1 + " : " + qid2 + " : " + similiarity);
+        //System.out.println(" Similiarity " + qid1 + " : " + qid2 + " : " + similiarity);
         similiarity = similiarity > 1 ? 1 : similiarity;
         return 2 * Math.acos(similiarity);
     }

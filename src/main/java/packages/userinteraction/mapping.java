@@ -13,13 +13,14 @@ public class mapping{
     // JSONObject questions = jsonImport.getjson("src/main/resources/android_questions.json");
     // JSONObject answers = jsonImport.getjson("src/main/resources/android_answers.json");
     // JSONObject users = jsonImport.getjson("src/main/resources/android/android_users.json");
-     Map<String, String> AidQid;
-    Map<String, List<String>>UidQid;
+    Map<String, String> AidQid;
+    public Map<String, String> QidUid;
+    public Map<String, List<String>>UidQid;
     Map<String, List<String>>UidAid;
     Map<String, List<String>>UidQaid;
     Map<String, List<String>>UidUid;
     Map<String, Integer>UidUid_commonQs; 
-    Map<String, Integer>UidUid_commonQs_sorted;
+    public Map<String, Integer>UidUid_commonQs_sorted;
     String qn;
     List<String> qn1;
     List<String>ans1;
@@ -30,6 +31,7 @@ public class mapping{
         m.mapUidAns();
         m.mapUidQaid();
         m.mapUidUid();
+        m.mapQnUid();
 
        // m.sort_UidUid_commonQs();
     }
@@ -39,6 +41,7 @@ public class mapping{
         this.mapUidAns();
         this.mapUidQaid();
         this.mapUidUid();
+        this.mapQnUid();
     }  
 
        public void mapAnsQn(){
@@ -54,6 +57,15 @@ public class mapping{
             //     AidQid.put((String)aid, qn);
             // }
            // System.out.println(AidQid);
+
+        }
+        public void mapQnUid(){
+            QidUid = new HashMap<String, String>();
+            Iterator<String> nodeIterator = questions.fieldNames();
+            while (nodeIterator.hasNext()) {
+                String key = nodeIterator.next();
+                QidUid.put(key, questions.get(key).get("userid").asText());
+            }
 
         }
         public void mapUidQn(){
@@ -194,7 +206,7 @@ public class mapping{
         public void sort_UidUid_commonQs(){
             
             List<Integer>sorted_value_list= new LinkedList<Integer>( UidUid_commonQs.values());
-            Collections.sort(sorted_value_list);
+            Collections.sort(sorted_value_list,Collections.reverseOrder());
             for (Object val : sorted_value_list) {
                 for(Object key : UidUid_commonQs.keySet()){
                     if (UidUid_commonQs.get(key)==val){
