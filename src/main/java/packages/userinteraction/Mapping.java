@@ -183,7 +183,7 @@ public class Mapping {
         UidUid_commonQs_sorted = new HashMap<String, Integer>();
         List<String> interact_Qid = new LinkedList<String>();
         int count_common_ques = 0;
-
+        int finished = 0;
         for (Object uid1 : UidQid.keySet()) {
             for (Object uid2 : UidQid.keySet()) {
                 if (uid1 != uid2 && (!UidUid_commonQs.containsKey(uid2 + "." + uid1))
@@ -233,10 +233,11 @@ public class Mapping {
                         //System.out.println(UidUid_commonQs.get((String)uid1+"."+(String)uid2));
                         socialGraph.addEdge(indexMap.get(uid1), indexMap.get(uid2), count_common_ques);
                     }
+                    System.out.println("Completed" + finished);
+
                 }
                 //System.out.println("Max:"+Runtime.getRuntime().maxMemory()+" Tot : "+Runtime.getRuntime().totalMemory()+" Free : "+ Runtime.getRuntime().freeMemory());
-
-          
+                finished++;
             }
 
             // UidUid.put((String) uid1, new LinkedList<String>(interact_Qid));
