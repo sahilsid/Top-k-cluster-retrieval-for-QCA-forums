@@ -22,11 +22,9 @@ public class Mapping {
     public Map<String, String> AidQid;
     public Map<String, String> QidUid;
     public Map<String, List<String>> UidQid;
+    public Map<String, String> AidUid;
     public Map<String, List<String>> UidAid;
     public Map<String, List<String>> UidQaid;
-    public Map<String, List<String>> UidUid;
-    public Map<String, Integer> UidUid_commonQs;
-    public Map<String, Integer> UidUid_commonQs_sorted;
     Map<String, Integer> indexMap;
     SocialGraph socialGraph;
     String qn;
@@ -36,22 +34,24 @@ public class Mapping {
     public class SocialGraph {
         int vertices;
         int edges;
-        List<Pair<Integer, Integer>> adjacencyList[];
+        Map<Integer, Integer> adjacencyList[];
 
         public SocialGraph(int v) {
             this.vertices = v;
-            this.edges=0;
-            adjacencyList = new LinkedList[v];
+            this.edges = 0;
+            adjacencyList = new HashMap[v];
             for (int i = 0; i < v; i++) {
-                this.adjacencyList[i] = new LinkedList<Pair<Integer, Integer>>();
+                this.adjacencyList[i] = new HashMap<Integer, Integer>();
             }
         }
 
-        public void addEdge(int source, int destination, int weight) {
+        public void addEdge(int source, int destination) {
             edges++;
-            System.out.println(edges+". Adding edge : "+source+"---->"+destination+"\tWeight : "+weight);
-            adjacencyList[source].add(new Pair<Integer, Integer>(destination, weight));
-            adjacencyList[destination].add(new Pair<Integer, Integer>(source, weight));
+            System.out.println(edges + ". Adding edge : " + source + "---->" + destination + "\tWeight : ");
+            int weight = adjacencyList[source].containsKey(destination) ? adjacencyList[source].get(destination) + 1
+                    : 1;
+            adjacencyList[source].put(destination, weight);
+            adjacencyList[destination].put(source, weight);
         }
 
         public Double getWeightedDistance(int a, int b) {
@@ -60,11 +60,11 @@ public class Mapping {
             return WeightedDistance;
         }
 
-        public void display(){
+        public void display() {
 
             System.out.print(" Vertex     \t Adjacency List\n");
-            for(int i = 0;i<this.vertices;i++){
-                System.out.print(i+"\t" + adjacencyList[i]);
+            for (int i = 0; i < this.vertices; i++) {
+                System.out.print(i + "\t" + adjacencyList[i]);
             }
         }
     }
@@ -88,7 +88,7 @@ public class Mapping {
         this.mapUidQn();
         this.mapUidAns();
         this.mapUidQaid();
-        this.mapUidUid();
+        // this.mapUidUid();
 
     }
 
@@ -99,7 +99,7 @@ public class Mapping {
             String key = nodeIterator.next();
             AidQid.put(key, answers.get(key).get("parentid").asText());
         }
-        System.out.println("Aid - Qid Generated");
+        System.out.println("Aid - Qid Generated" + AidQid.size());
 
     }
 
@@ -110,7 +110,7 @@ public class Mapping {
             String key = nodeIterator.next();
             QidUid.put(key, questions.get(key).get("userid").asText());
         }
-        System.out.println("Qid - Uid Generated");
+        System.out.println("Qid - Uid Generated" + QidUid.size());
 
     }
 
@@ -134,6 +134,7 @@ public class Mapping {
 
     public void mapUidAns() {
         UidAid = new HashMap<String, List<String>>();
+        AidUid = new HashMap<String, String>();
         int count = 0;
         Iterator<String> nodeIterator = users.fieldNames();
 
@@ -144,6 +145,7 @@ public class Mapping {
             while (arrayiIterator.hasNext()) {
                 String val = arrayiIterator.next().asText();
                 answerids.add(val);
+                AidUid.put(val, key);
             }
             UidAid.put(key, new LinkedList<String>(answerids));
 
@@ -177,77 +179,88 @@ public class Mapping {
         System.out.println("Uid - Qaid Generated ");
     }
 
-    public void mapUidUid() {
-        UidUid = new HashMap<String, List<String>>();
-        UidUid_commonQs = new HashMap<String, Integer>();
-        UidUid_commonQs_sorted = new HashMap<String, Integer>();
-        List<String> interact_Qid = new LinkedList<String>();
-        int count_common_ques = 0;
-
-        for (Object uid1 : UidQid.keySet()) {
-            for (Object uid2 : UidQid.keySet()) {
-                if (uid1 != uid2 && (!UidUid_commonQs.containsKey(uid2 + "." + uid1))
-                        && (!UidUid_commonQs.containsKey(uid1 + "." + uid2))) {
-                    List<String> l1 = UidQid.get(uid1);// qid's
-                    List<String> l2 = UidQid.get(uid2);
-
-                    if (UidQaid.containsKey(uid1)) {
-                        List<String> ql1 = UidQaid.get(uid1);// Qaid
-                        List<String> temp2 = new LinkedList<String>(l2);
-                        temp2.retainAll(ql1);
-
-                        if (temp2.size() > 0) {
-                            // System.out.println("COMMON QAID OF USER2"+temp2);
-
-                            interact_Qid.add((String) uid2);
-                            count_common_ques = count_common_ques + temp2.size();
-                        }
-                        temp2=null;
-                    }
-                    if (UidQaid.containsKey(uid2)) {
-
-                        List<String> ql2 = UidQaid.get(uid2);
-                        List<String> temp = new LinkedList<String>(l1);
-                        // temp.addAll(l1);// if we use l1, it will be modified
-
-                        temp.retainAll(ql2);
-
-                        if (temp.size() > 0) {
-                            // System.out.println("COMMON QAID OF USER2"+temp);
-
-                            if (!interact_Qid.contains(uid2)) {
-                                interact_Qid.add((String) uid2);
-                            }
-                            count_common_ques = count_common_ques + temp.size();
-                        }
-                        temp=null;
-                        System.gc();
-                    }
-                    // if(UidQaid.containsKey(uid1)||UidQaid.containsKey(uid2))
-                    // {
-                    // interact_Qid.add((String)uid2+"."+count_common_ques);
-                    // }
-                    if (count_common_ques > 0) {
-                        // UidUid_commonQs.put(((String) uid1 + "." + (String) uid2),
-                        // count_common_ques);
-                        //System.out.println(UidUid_commonQs.get((String)uid1+"."+(String)uid2));
-                        socialGraph.addEdge(indexMap.get(uid1), indexMap.get(uid2), count_common_ques);
-                    }
+    public void generateSocialGraph() {
+        for (String question : QidUid.keySet()) {
+            for (String answer : AidQid.keySet()) {
+                if (AidQid.get(answer) == question) {
+                    socialGraph.addEdge(indexMap.get(QidUid.get(question)), indexMap.get(AidUid.get(answer)));
                 }
-                //System.out.println("Max:"+Runtime.getRuntime().maxMemory()+" Tot : "+Runtime.getRuntime().totalMemory()+" Free : "+ Runtime.getRuntime().freeMemory());
-
-          
             }
-
-            // UidUid.put((String) uid1, new LinkedList<String>(interact_Qid));
-            // System.out.println("uid-uid"+UidUid.get(uid1));
-
-            interact_Qid.clear();
-            count_common_ques = 0;
         }
-        System.out.println("Social Graph Generated");
-        socialGraph.display();
     }
+    // public void mapUidUid() {
+    // UidUid = new HashMap<String, List<String>>();
+    // UidUid_commonQs = new HashMap<String, Integer>();
+    // UidUid_commonQs_sorted = new HashMap<String, Integer>();
+    // List<String> interact_Qid = new LinkedList<String>();
+    // int count_common_ques = 0;
+
+    // for (Object uid1 : UidQid.keySet()) {
+    // for (Object uid2 : UidQid.keySet()) {
+    // if (uid1 != uid2 && (!UidUid_commonQs.containsKey(uid2 + "." + uid1))
+    // && (!UidUid_commonQs.containsKey(uid1 + "." + uid2))) {
+    // List<String> l1 = UidQid.get(uid1);// qid's
+    // List<String> l2 = UidQid.get(uid2);
+
+    // if (UidQaid.containsKey(uid1)) {
+    // List<String> ql1 = UidQaid.get(uid1);// Qaid
+    // List<String> temp2 = new LinkedList<String>(l2);
+    // temp2.retainAll(ql1);
+
+    // if (temp2.size() > 0) {
+    // // System.out.println("COMMON QAID OF USER2"+temp2);
+
+    // interact_Qid.add((String) uid2);
+    // count_common_ques = count_common_ques + temp2.size();
+    // }
+    // temp2=null;
+    // }
+    // if (UidQaid.containsKey(uid2)) {
+
+    // List<String> ql2 = UidQaid.get(uid2);
+    // List<String> temp = new LinkedList<String>(l1);
+    // // temp.addAll(l1);// if we use l1, it will be modified
+
+    // temp.retainAll(ql2);
+
+    // if (temp.size() > 0) {
+    // // System.out.println("COMMON QAID OF USER2"+temp);
+
+    // if (!interact_Qid.contains(uid2)) {
+    // interact_Qid.add((String) uid2);
+    // }
+    // count_common_ques = count_common_ques + temp.size();
+    // }
+    // temp=null;
+    // System.gc();
+    // }
+    // // if(UidQaid.containsKey(uid1)||UidQaid.containsKey(uid2))
+    // // {
+    // // interact_Qid.add((String)uid2+"."+count_common_ques);
+    // // }
+    // if (count_common_ques > 0) {
+    // // UidUid_commonQs.put(((String) uid1 + "." + (String) uid2),
+    // // count_common_ques);
+    // //System.out.println(UidUid_commonQs.get((String)uid1+"."+(String)uid2));
+    // socialGraph.addEdge(indexMap.get(uid1), indexMap.get(uid2),
+    // count_common_ques);
+    // }
+    // }
+    // //System.out.println("Max:"+Runtime.getRuntime().maxMemory()+" Tot :
+    // "+Runtime.getRuntime().totalMemory()+" Free : "+
+    // Runtime.getRuntime().freeMemory());
+
+    // }
+
+    // // UidUid.put((String) uid1, new LinkedList<String>(interact_Qid));
+    // // System.out.println("uid-uid"+UidUid.get(uid1));
+
+    // interact_Qid.clear();
+    // count_common_ques = 0;
+    // }
+    // System.out.println("Social Graph Generated");
+    // socialGraph.display();
+    // }
 
     public Double getSocialDistance(String user1, String user2) {
         // return 2 * Math.acos(UidUid_commonQs_sorted.containsKey(user1 + "." + user2)
@@ -258,19 +271,19 @@ public class Mapping {
         return 2 * Math.acos(socialGraph.getWeightedDistance(indexMap.get(user1), indexMap.get(user2)));
     }
 
-    public void sort_UidUid_commonQs() {
+    // public void sort_UidUid_commonQs() {
 
-        List<Integer> sorted_value_list = new LinkedList<Integer>(UidUid_commonQs.values());
-        Collections.sort(sorted_value_list);
-        for (Object val : sorted_value_list) {
-            for (Object key : UidUid_commonQs.keySet()) {
-                if (UidUid_commonQs.get(key) == val) {
-                    UidUid_commonQs_sorted.put((String) key, (Integer) val);
-                }
-            }
+    //     List<Integer> sorted_value_list = new LinkedList<Integer>(UidUid_commonQs.values());
+    //     Collections.sort(sorted_value_list);
+    //     for (Object val : sorted_value_list) {
+    //         for (Object key : UidUid_commonQs.keySet()) {
+    //             if (UidUid_commonQs.get(key) == val) {
+    //                 UidUid_commonQs_sorted.put((String) key, (Integer) val);
+    //             }
+    //         }
 
-        }
-        System.out.println(UidUid_commonQs_sorted);
-    }
+    //     }
+    //     System.out.println(UidUid_commonQs_sorted);
+    // }
 
 }
