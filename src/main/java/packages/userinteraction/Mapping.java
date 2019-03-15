@@ -50,6 +50,12 @@ public class Mapping {
             adjacencyList[source].add(new Pair<Integer,Integer>(destination,weight));
             adjacencyList[destination].add(new Pair<Integer,Integer>(source,weight));
         }
+
+        public Double getWeightedDistance(int a,int b){
+            Double WeightedDistance = Double.POSITIVE_INFINITY ;
+            //DIJKSTRA'S SHORTEST PATH O(ElogV)
+            return WeightedDistance;
+        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -232,8 +238,7 @@ public class Mapping {
                     // {
                     // interact_Qid.add((String)uid2+"."+count_common_ques);
                     // }
-                    if (count_common_ques > 0) {
-                        
+                    if (count_common_ques > 0) {                        
                         // UidUid_commonQs.put(((String) uid1 + "." + (String) uid2),
                         // count_common_ques);
                         // System.out.println(UidUid_commonQs.get((String)uid1+"."+(String)uid2));
@@ -248,15 +253,15 @@ public class Mapping {
             count_common_ques = 0;
         }
         // System.out.println("uid-uid"+UidUid);
-        System.out.println(AdjacencyMatrix);
     }
 
     public Double getSocialDistance(String user1, String user2) {
-        return 2 * Math.acos(UidUid_commonQs_sorted.containsKey(user1 + "." + user2)
-                ? UidUid_commonQs_sorted.get(user1 + "." + user2)
-                : UidUid_commonQs_sorted.containsKey(user2 + "." + user1)
-                        ? UidUid_commonQs_sorted.get(user2 + "." + user1)
-                        : 0.0);
+        // return 2 * Math.acos(UidUid_commonQs_sorted.containsKey(user1 + "." + user2)
+        //         ? UidUid_commonQs_sorted.get(user1 + "." + user2)
+        //         : UidUid_commonQs_sorted.containsKey(user2 + "." + user1)
+        //                 ? UidUid_commonQs_sorted.get(user2 + "." + user1)
+        //                 : 0.0);
+        return 2 * Math.acos(socialGraph.getWeightedDistance(indexMap.get(user1),indexMap.get(user2)));
     }
 
     public void sort_UidUid_commonQs() {
