@@ -202,6 +202,7 @@ public class Mapping {
                             interact_Qid.add((String) uid2);
                             count_common_ques = count_common_ques + temp2.size();
                         }
+                        temp2=null;
                     }
                     if (UidQaid.containsKey(uid2)) {
 
@@ -219,6 +220,7 @@ public class Mapping {
                             }
                             count_common_ques = count_common_ques + temp.size();
                         }
+                        temp=null;
                     }
                     // if(UidQaid.containsKey(uid1)||UidQaid.containsKey(uid2))
                     // {

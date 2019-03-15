@@ -25,8 +25,8 @@ public class Basic {
     String query;
     String queryUserId;
     Tfidf tfidf;
-    loadRelevantQuestions relevantQuestions;
     Double alpha;
+    loadRelevantQuestions relevantQuestions;
 
     public static void main(String[] args) throws Exception {
         Generate generateMtree = new Generate(4);
@@ -71,14 +71,14 @@ public class Basic {
 
             question = (String) iter_tlist.next();
             List cluster = FindCluster(question, 5);
-            
+
             if (!cluster.isEmpty()) {
                 rList.add(cluster);
                 Tau = (alpha * avgSocialDistance(cluster)) + ((1 - alpha) * avgTextualDistance(cluster));
             }
 
             uid = mapping.QidUid.get((String) iter_slist.next());
-            System.out.println(uid);            
+            System.out.println(uid);
 
             sb = mapping.UidUid_commonQs_sorted.containsKey(uid + "." + queryUserId)
                     ? mapping.UidUid_commonQs_sorted.get(uid + "." + queryUserId)
@@ -115,7 +115,7 @@ public class Basic {
         for (Object ques : cList) {
             text_distance += relevantQuestions.relevantQuestions.get((String) ques);
         }
-        return  cList.isEmpty() ? 0.0 :  text_distance / cList.size();
+        return cList.isEmpty() ? 0.0 : text_distance / cList.size();
     }
 
     public void initSList() {
