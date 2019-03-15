@@ -179,12 +179,76 @@ public class Mapping {
         System.out.println("Uid - Qaid Generated ");
     }
 
+<<<<<<< HEAD
     public void generateSocialGraph() {
         for (String question : QidUid.keySet()) {
             for (String answer : AidQid.keySet()) {
                 if (AidQid.get(answer) == question) {
                     socialGraph.addEdge(indexMap.get(QidUid.get(question)), indexMap.get(AidUid.get(answer)));
                 }
+=======
+    public void mapUidUid() {
+        UidUid = new HashMap<String, List<String>>();
+        UidUid_commonQs = new HashMap<String, Integer>();
+        UidUid_commonQs_sorted = new HashMap<String, Integer>();
+        List<String> interact_Qid = new LinkedList<String>();
+        int count_common_ques = 0;
+        int finished = 0;
+        for (Object uid1 : UidQid.keySet()) {
+            for (Object uid2 : UidQid.keySet()) {
+                if (uid1 != uid2 && (!UidUid_commonQs.containsKey(uid2 + "." + uid1))
+                        && (!UidUid_commonQs.containsKey(uid1 + "." + uid2))) {
+                    List<String> l1 = UidQid.get(uid1);// qid's
+                    List<String> l2 = UidQid.get(uid2);
+
+                    if (UidQaid.containsKey(uid1)) {
+                        List<String> ql1 = UidQaid.get(uid1);// Qaid
+                        List<String> temp2 = new LinkedList<String>(l2);
+                        temp2.retainAll(ql1);
+
+                        if (temp2.size() > 0) {
+                            // System.out.println("COMMON QAID OF USER2"+temp2);
+
+                            interact_Qid.add((String) uid2);
+                            count_common_ques = count_common_ques + temp2.size();
+                        }
+                        temp2=null;
+                    }
+                    if (UidQaid.containsKey(uid2)) {
+
+                        List<String> ql2 = UidQaid.get(uid2);
+                        List<String> temp = new LinkedList<String>(l1);
+                        // temp.addAll(l1);// if we use l1, it will be modified
+
+                        temp.retainAll(ql2);
+
+                        if (temp.size() > 0) {
+                            // System.out.println("COMMON QAID OF USER2"+temp);
+
+                            if (!interact_Qid.contains(uid2)) {
+                                interact_Qid.add((String) uid2);
+                            }
+                            count_common_ques = count_common_ques + temp.size();
+                        }
+                        temp=null;
+                        System.gc();
+                    }
+                    // if(UidQaid.containsKey(uid1)||UidQaid.containsKey(uid2))
+                    // {
+                    // interact_Qid.add((String)uid2+"."+count_common_ques);
+                    // }
+                    if (count_common_ques > 0) {
+                        // UidUid_commonQs.put(((String) uid1 + "." + (String) uid2),
+                        // count_common_ques);
+                        //System.out.println(UidUid_commonQs.get((String)uid1+"."+(String)uid2));
+                        socialGraph.addEdge(indexMap.get(uid1), indexMap.get(uid2), count_common_ques);
+                    }
+                    System.out.println("Completed" + finished);
+
+                }
+                //System.out.println("Max:"+Runtime.getRuntime().maxMemory()+" Tot : "+Runtime.getRuntime().totalMemory()+" Free : "+ Runtime.getRuntime().freeMemory());
+                finished++;
+>>>>>>> 3de29ca60bb0d7253fa44d9068744a4823a39d87
             }
         }
     }
