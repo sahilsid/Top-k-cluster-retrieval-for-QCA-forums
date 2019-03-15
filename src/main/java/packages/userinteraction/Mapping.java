@@ -1,7 +1,7 @@
 package packages.userinteraction;
 
 import packages.textprocess.*;
-import javafx.util.Pair; 
+import javafx.util.Pair;
 import java.util.*;
 import org.json.simple.JSONObject;
 import com.google.common.collect.Multimap;
@@ -10,9 +10,9 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 
 public class Mapping {
-    JsonNode questions = jsonImport.getjsonlarge("src/main/resources/android_questions.json");
-    JsonNode answers = jsonImport.getjsonlarge("src/main/resources/android_answers.json");
-    JsonNode users = jsonImport.getjsonlarge("src/main/resources/android_users.json");
+    JsonNode questions = jsonImport.getjsonlarge("src/main/resources/android/android_questions.json");
+    JsonNode answers = jsonImport.getjsonlarge("src/main/resources/android/android_answers.json");
+    JsonNode users = jsonImport.getjsonlarge("src/main/resources/android/android_users.json");
     // JSONObject questions =
     // jsonImport.getjson("src/main/resources/android_questions.json");
     // JSONObject answers =
@@ -29,48 +29,58 @@ public class Mapping {
     public Map<String, Integer> UidUid_commonQs_sorted;
     Map<String, Integer> indexMap;
     SocialGraph socialGraph;
-    Integer AdjacencyMatrix[][];
     String qn;
     List<String> qn1;
     List<String> ans1;
 
-
-    public class SocialGraph{
+    public class SocialGraph {
         int vertices;
-        List<Pair<Integer,Integer>> adjacencyList[];
+        int edges;
+        List<Pair<Integer, Integer>> adjacencyList[];
 
-        public SocialGraph(int v){
+        public SocialGraph(int v) {
             this.vertices = v;
+            this.edges=0;
             adjacencyList = new LinkedList[v];
-            for(int i=0;i<v;i++){
-                this.adjacencyList[i] = new LinkedList<Pair<Integer,Integer>>();
+            for (int i = 0; i < v; i++) {
+                this.adjacencyList[i] = new LinkedList<Pair<Integer, Integer>>();
             }
         }
-        public void addEdge(int source, int destination, int weight){
-            adjacencyList[source].add(new Pair<Integer,Integer>(destination,weight));
-            adjacencyList[destination].add(new Pair<Integer,Integer>(source,weight));
+
+        public void addEdge(int source, int destination, int weight) {
+            edges++;
+            System.out.println(edges+". Adding edge : "+source+"---->"+destination+"\tWeight : "+weight);
+            adjacencyList[source].add(new Pair<Integer, Integer>(destination, weight));
+            adjacencyList[destination].add(new Pair<Integer, Integer>(source, weight));
         }
 
-        public Double getWeightedDistance(int a,int b){
-            Double WeightedDistance = Double.POSITIVE_INFINITY ;
-            //DIJKSTRA'S SHORTEST PATH O(ElogV)
+        public Double getWeightedDistance(int a, int b) {
+            Double WeightedDistance = Double.POSITIVE_INFINITY;
+            // DIJKSTRA'S SHORTEST PATH O(ElogV)
             return WeightedDistance;
+        }
+
+        public void display(){
+
+            System.out.print(" Vertex     \t Adjacency List\n");
+            for(int i = 0;i<this.vertices;i++){
+                System.out.print(i+"\t" + adjacencyList[i]);
+            }
         }
     }
 
     public static void main(String[] args) throws Exception {
         Mapping m = new Mapping();
-
     }
 
     public Mapping() throws Exception {
         Iterator<String> nodeIterator = users.fieldNames();
-        int count = 0;
+        Integer count = 0;
         indexMap = new HashMap<String, Integer>();
         while (nodeIterator.hasNext()) {
             String key = nodeIterator.next();// userid
-
-            indexMap.put(key, count++);
+            indexMap.put(key, count);
+            count++;
         }
         System.out.println(" Users : " + indexMap.size());
         socialGraph = new SocialGraph(indexMap.size());
@@ -89,12 +99,7 @@ public class Mapping {
             String key = nodeIterator.next();
             AidQid.put(key, answers.get(key).get("parentid").asText());
         }
-        // for (Object aid : answers.keySet()) {
-        // JSONObject value = (JSONObject) answers.get(aid);
-        // qn= (String)value.get("parentid");
-        // AidQid.put((String)aid, qn);
-        // }
-        // System.out.println(AidQid);
+        System.out.println("Aid - Qid Generated");
 
     }
 
@@ -105,25 +110,14 @@ public class Mapping {
             String key = nodeIterator.next();
             QidUid.put(key, questions.get(key).get("userid").asText());
         }
-        // for (Object aid : answers.keySet()) {
-        // JSONObject value = (JSONObject) answers.get(aid);
-        // qn= (String)value.get("parentid");
-        // AidQid.put((String)aid, qn);
-        // }
-        // System.out.println(AidQid);
+        System.out.println("Qid - Uid Generated");
 
     }
 
     public void mapUidQn() {
         UidQid = new HashMap<String, List<String>>();
         Iterator<String> nodeIterator = users.fieldNames();
-        // for (Object uid : users.keySet()) {
-        // JSONObject value2 = (JSONObject) users.get(uid);
-        // qn1= (List<String>)value2.get("questions");
-        // if (!qn1.isEmpty()){
-        // UidQid.put((String)uid, qn1);
-        // }
-        // }
+
         while (nodeIterator.hasNext()) {
             List<String> questionids = new LinkedList<String>();
             String key = nodeIterator.next();// userid
@@ -135,34 +129,27 @@ public class Mapping {
             UidQid.put(key, new LinkedList<String>(questionids));
             // System.out.println(UidQid.get(key));
         }
-        // System.out.println(UidQid);
+        System.out.println("Uid - Qid Generated");
     }
 
     public void mapUidAns() {
         UidAid = new HashMap<String, List<String>>();
         int count = 0;
         Iterator<String> nodeIterator = users.fieldNames();
-        // for (Object uid : users.keySet()) {
-        // JSONObject value3 = (JSONObject) users.get(uid);
-        // ans1= (List<String>)value3.get("answers");
-        // if (!ans1.isEmpty()){
-        // UidAid.put((String)uid, ans1);
-        // }
-        // }
+
         while (nodeIterator.hasNext()) {
             List<String> answerids = new LinkedList<String>();
             String key = nodeIterator.next();// userid
             Iterator<JsonNode> arrayiIterator = users.get(key).get("answers").elements();
-            indexMap.put(key, count);
             while (arrayiIterator.hasNext()) {
                 String val = arrayiIterator.next().asText();
                 answerids.add(val);
             }
             UidAid.put(key, new LinkedList<String>(answerids));
-            // System.out.println(UidAid.get(key));
 
         }
         System.out.println(UidAid.size());
+        System.out.println("Uid - Aid Generated");
 
     }
 
@@ -187,7 +174,7 @@ public class Mapping {
                 qid_list.clear();
             }
         }
-        // System.out.println(UidQaid);
+        System.out.println("Uid - Qaid Generated ");
     }
 
     public void mapUidUid() {
@@ -201,7 +188,7 @@ public class Mapping {
             for (Object uid2 : UidQid.keySet()) {
                 if (uid1 != uid2 && (!UidUid_commonQs.containsKey(uid2 + "." + uid1))
                         && (!UidUid_commonQs.containsKey(uid1 + "." + uid2))) {
-                    List<String> l1 =  UidQid.get(uid1);// qid's
+                    List<String> l1 = UidQid.get(uid1);// qid's
                     List<String> l2 = UidQid.get(uid2);
 
                     if (UidQaid.containsKey(uid1)) {
@@ -218,7 +205,7 @@ public class Mapping {
                     }
                     if (UidQaid.containsKey(uid2)) {
 
-                        List<String> ql2 =UidQaid.get(uid2);
+                        List<String> ql2 = UidQaid.get(uid2);
                         List<String> temp = new LinkedList<String>(l1);
                         // temp.addAll(l1);// if we use l1, it will be modified
 
@@ -232,36 +219,40 @@ public class Mapping {
                             }
                             count_common_ques = count_common_ques + temp.size();
                         }
-
                     }
                     // if(UidQaid.containsKey(uid1)||UidQaid.containsKey(uid2))
                     // {
                     // interact_Qid.add((String)uid2+"."+count_common_ques);
                     // }
-                    if (count_common_ques > 0) {                        
+                    if (count_common_ques > 0) {
                         // UidUid_commonQs.put(((String) uid1 + "." + (String) uid2),
                         // count_common_ques);
-                        // System.out.println(UidUid_commonQs.get((String)uid1+"."+(String)uid2));
-                        socialGraph.addEdge(indexMap.get(uid1), indexMap.get(uid2),count_common_ques);
+                        //System.out.println(UidUid_commonQs.get((String)uid1+"."+(String)uid2));
+                        socialGraph.addEdge(indexMap.get(uid1), indexMap.get(uid2), count_common_ques);
                     }
                 }
+                //System.out.println("Max:"+Runtime.getRuntime().maxMemory()+" Tot : "+Runtime.getRuntime().totalMemory()+" Free : "+ Runtime.getRuntime().freeMemory());
+
+          
             }
+
             // UidUid.put((String) uid1, new LinkedList<String>(interact_Qid));
             // System.out.println("uid-uid"+UidUid.get(uid1));
 
             interact_Qid.clear();
             count_common_ques = 0;
         }
-        // System.out.println("uid-uid"+UidUid);
+        System.out.println("Social Graph Generated");
+        socialGraph.display();
     }
 
     public Double getSocialDistance(String user1, String user2) {
         // return 2 * Math.acos(UidUid_commonQs_sorted.containsKey(user1 + "." + user2)
-        //         ? UidUid_commonQs_sorted.get(user1 + "." + user2)
-        //         : UidUid_commonQs_sorted.containsKey(user2 + "." + user1)
-        //                 ? UidUid_commonQs_sorted.get(user2 + "." + user1)
-        //                 : 0.0);
-        return 2 * Math.acos(socialGraph.getWeightedDistance(indexMap.get(user1),indexMap.get(user2)));
+        // ? UidUid_commonQs_sorted.get(user1 + "." + user2)
+        // : UidUid_commonQs_sorted.containsKey(user2 + "." + user1)
+        // ? UidUid_commonQs_sorted.get(user2 + "." + user1)
+        // : 0.0);
+        return 2 * Math.acos(socialGraph.getWeightedDistance(indexMap.get(user1), indexMap.get(user2)));
     }
 
     public void sort_UidUid_commonQs() {
