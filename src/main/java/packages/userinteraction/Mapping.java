@@ -1,6 +1,7 @@
 package packages.userinteraction;
 
 import packages.textprocess.*;
+import javafx.util.Pair; 
 import java.util.*;
 import org.json.simple.JSONObject;
 import com.google.common.collect.Multimap;
@@ -26,11 +27,30 @@ public class Mapping {
     public Map<String, List<String>> UidUid;
     public Map<String, Integer> UidUid_commonQs;
     public Map<String, Integer> UidUid_commonQs_sorted;
-     Map<String, Integer> indexMap;
+    Map<String, Integer> indexMap;
+    SocialGraph socialGraph;
     Integer AdjacencyMatrix[][];
     String qn;
     List<String> qn1;
     List<String> ans1;
+
+
+    public class SocialGraph{
+        int vertices;
+        List<Pair<Integer,Integer>> adjacencyList[];
+
+        public SocialGraph(int v){
+            this.vertices = v;
+            adjacencyList = new LinkedList[v];
+            for(int i=0;i<v;i++){
+                this.adjacencyList[i] = new LinkedList<Pair<Integer,Integer>>();
+            }
+        }
+        public void addEdge(int source, int destination, int weight){
+            adjacencyList[source].add(new Pair<Integer,Integer>(destination,weight));
+            adjacencyList[destination].add(new Pair<Integer,Integer>(source,weight));
+        }
+    }
 
     public static void main(String[] args) throws Exception {
         Mapping m = new Mapping();
@@ -47,6 +67,7 @@ public class Mapping {
             indexMap.put(key, count++);
         }
         System.out.println(" Users : " + indexMap.size());
+        socialGraph = new SocialGraph(indexMap.size());
         this.mapAnsQn();
         this.mapUidQn();
         this.mapUidAns();
@@ -170,17 +191,16 @@ public class Mapping {
         List<String> interact_Qid = new LinkedList<String>();
         int count_common_ques = 0;
 
-        AdjacencyMatrix = new Integer[indexMap.size()][indexMap.size()];
         for (Object uid1 : UidQid.keySet()) {
             for (Object uid2 : UidQid.keySet()) {
                 if (uid1 != uid2 && (!UidUid_commonQs.containsKey(uid2 + "." + uid1))
                         && (!UidUid_commonQs.containsKey(uid1 + "." + uid2))) {
-                    LinkedList<String> l1 = new LinkedList<String>(UidQid.get(uid1));// qid's
-                    LinkedList<String> l2 = new LinkedList<String>(UidQid.get(uid2));
+                    List<String> l1 =  UidQid.get(uid1);// qid's
+                    List<String> l2 = UidQid.get(uid2);
 
                     if (UidQaid.containsKey(uid1)) {
-                        LinkedList<String> ql1 = new LinkedList<String>(UidQaid.get(uid1));// Qaid
-                        LinkedList<String> temp2 = new LinkedList<String>(l2);
+                        List<String> ql1 = UidQaid.get(uid1);// Qaid
+                        List<String> temp2 = new LinkedList<String>(l2);
                         temp2.retainAll(ql1);
 
                         if (temp2.size() > 0) {
@@ -192,8 +212,8 @@ public class Mapping {
                     }
                     if (UidQaid.containsKey(uid2)) {
 
-                        LinkedList<String> ql2 = new LinkedList<String>(UidQaid.get(uid2));
-                        LinkedList<String> temp = new LinkedList<String>(l1);
+                        List<String> ql2 =UidQaid.get(uid2);
+                        List<String> temp = new LinkedList<String>(l1);
                         // temp.addAll(l1);// if we use l1, it will be modified
 
                         temp.retainAll(ql2);
@@ -213,10 +233,11 @@ public class Mapping {
                     // interact_Qid.add((String)uid2+"."+count_common_ques);
                     // }
                     if (count_common_ques > 0) {
+                        
                         // UidUid_commonQs.put(((String) uid1 + "." + (String) uid2),
                         // count_common_ques);
                         // System.out.println(UidUid_commonQs.get((String)uid1+"."+(String)uid2));
-                        AdjacencyMatrix[indexMap.get(uid1)][indexMap.get(uid2)] = count_common_ques;
+                        socialGraph.addEdge(indexMap.get(uid1), indexMap.get(uid2),count_common_ques);
                     }
                 }
             }
