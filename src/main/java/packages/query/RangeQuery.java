@@ -4,7 +4,7 @@ import java.awt.List;
 import java.util.*;
 import packages.mtree.Mtree;
 import packages.textprocess.Tfidf;
-import packages.userinteraction.mapping;
+import packages.userinteraction.Mapping;;
 
 /**
  * loadRelevantQuestions
@@ -17,16 +17,16 @@ public class RangeQuery {
     String question;
     public Map<String,Double> relevantQuestions;
     Tfidf tfidf;
-    mapping m;
+    Mapping mapping;
     Double socialDist;
-    public RangeQuery(Mtree r, Double search, String Query, String question,Tfidf tfidf_, mapping m,Double SocialDist) {
+    public RangeQuery(Mtree r, Double search, String Query, String question,Tfidf tfidf_, Mapping m,Double SocialDist) {
         this.root = r;
         this.searchRadius = search;
         this.query = Query;
         this.relevantQuestions = new HashMap<String,Double>();
         this.tfidf = tfidf_;
         this.socialDist = SocialDist;
-        this.m = m;
+        this.mapping = m;
         this.question=question;
         load();
     }
@@ -59,7 +59,7 @@ public class RangeQuery {
                 for (Mtree child : node.getChildren()) {
                     if (queryDistance - tfidf.getdistance(node.getQid(), child.getQid()) < searchRadius) {
                         Double dist = tfidf.getquerydistance(child.getQid(), query);
-                        if (dist < searchRadius && m.getSocialDistance(child.getQid(), question )<socialDist) {
+                        if (dist < searchRadius && mapping.getSocialDistance(child.getQid(), question )<socialDist) {
                             relevantQuestions.put(child.getQid(),dist);
                         }
                     }
@@ -71,7 +71,7 @@ public class RangeQuery {
                     if (queryDistance - tfidf.getdistance(node.getQid(), child.getQid()) < searchRadius
                             + node.getRadius()) {
                         Double dist = tfidf.getquerydistance(child.getQid(), query);
-                        if (dist < searchRadius + node.getRadius() && m.getSocialDistance(child.getQid(), question )<socialDist) {
+                        if (dist < searchRadius + node.getRadius() && mapping.getSocialDistance(child.getQid(), question )<socialDist) {
                             queue.add(child);
                         }
                     }

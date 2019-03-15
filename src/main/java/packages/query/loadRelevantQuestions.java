@@ -29,6 +29,10 @@ public class loadRelevantQuestions {
         return relevantQuestions;
     }
 
+    public Double getRelevance(String qid){
+        return this.relevantQuestions.containsKey(qid) ? this.relevantQuestions.get(qid) : 0.0; 
+    }
+
     public void load() {
         Queue<Mtree> queue = new LinkedList<Mtree>();
         for (Mtree child : root.getChildren())

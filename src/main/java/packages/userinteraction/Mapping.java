@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 
-public class mapping {
+public class Mapping {
     JsonNode questions = jsonImport.getjsonlarge("src/main/resources/android_questions.json");
     JsonNode answers = jsonImport.getjsonlarge("src/main/resources/android_answers.json");
     JsonNode users = jsonImport.getjsonlarge("src/main/resources/android_users.json");
@@ -33,11 +33,11 @@ public class mapping {
     List<String> ans1;
 
     public static void main(String[] args) throws Exception {
-        mapping m = new mapping();
+        Mapping m = new Mapping();
 
     }
 
-    public mapping() throws Exception {
+    public Mapping() throws Exception {
         Iterator<String> nodeIterator = users.fieldNames();
         int count = 0;
         indexMap = new HashMap<String, Integer>();
