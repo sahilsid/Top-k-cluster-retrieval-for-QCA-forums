@@ -221,6 +221,7 @@ public class Mapping {
                             count_common_ques = count_common_ques + temp.size();
                         }
                         temp=null;
+                        System.gc();
                     }
                     // if(UidQaid.containsKey(uid1)||UidQaid.containsKey(uid2))
                     // {
