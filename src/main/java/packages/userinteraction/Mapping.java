@@ -1,6 +1,6 @@
 package packages.userinteraction;
 
-import packages.textprocess.*;
+import packages.textprocess.jsonImport;
 import java.util.*;
 import org.json.simple.JSONObject;
 import com.google.common.collect.Multimap;
