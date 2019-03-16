@@ -28,7 +28,7 @@ public class Dataset_batches {
         // JSONObject input_file = getjson(path);
         // JsonNode input_file= jsonImport.getjsonlarge(path);
         Dataset_batches.getjsonlarge("src/main/resources/android/android_questions",
-                "src/main/resources/subFiles/questions/subfile");
+                "src/main/resources/subFiles/questions/android_questions");
     }
 
     public Dataset_batches(String file_name, String path) throws Exception {
@@ -46,7 +46,7 @@ public class Dataset_batches {
         int count = 0;
         ObjectMapper mapper = new ObjectMapper();
         OutputStream out;
-        Integer threshold = 500;
+        Integer threshold = 2500;
         Integer totalSubFiles = threshold >0 ? Math.floorDiv(input_file.size(),threshold )+1: 0 ;
         JsonNode subFile[] = new JsonNode[totalSubFiles];
         subFile[0] = mapper.createObjectNode();
@@ -69,7 +69,7 @@ public class Dataset_batches {
             count++;
         }
         System.out.println(out);
-        mapper.writeValue(out, subFile[file_number-1]);
+        mapper.writeValue(out, (Object) subFile[file_number-1]);
+    
     }
-
 }

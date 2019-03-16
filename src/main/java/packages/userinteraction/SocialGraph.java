@@ -45,7 +45,9 @@ public class SocialGraph {
 
         System.out.print(" Vertex     \t Adjacency List\n");
         for (int i = 0; i < this.vertices; i++) {
-            System.out.print(i + "\t" + adjacencyList[i]);
+            System.out.println(i + "\t" + adjacencyList[i]);
         }
+        System.out.print(" Total Vertices  : " + vertices + "Total Edges :  " +edges);
+
     }
 }
