@@ -1,6 +1,6 @@
 package packages.userinteraction;
 
-import packages.textprocess.jsonImport;
+import packages.textprocess.*;
 import java.util.*;
 import org.json.simple.JSONObject;
 import com.google.common.collect.Multimap;
@@ -50,6 +50,7 @@ public class Mapping {
         this.mapUidQn();
         this.mapUidAns();
         this.mapUidQaid();
+        this.mapQidUid();
         generateSocialGraph();
     }
 
@@ -145,9 +146,13 @@ public class Mapping {
             for (String answer : AidQid.keySet()) {
                 if (AidQid.get(answer) == question) {
                     socialGraph.addEdge(indexMap.get(QidUid.get(question)), indexMap.get(AidUid.get(answer)));
+                    
                 }
             }
         }
+    }
+    public Integer getInteractionLevel(String user1, String user2){
+        return socialGraph.getWeight(indexMap.get(user1),indexMap.get(user2));
     }
     // public void mapUidUid() {
     // UidUid = new HashMap<String, List<String>>();

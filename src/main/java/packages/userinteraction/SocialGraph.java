@@ -31,6 +31,10 @@ public class SocialGraph {
         adjacencyList[destination].put(source, weight);
     }
 
+    public Integer getWeight(int a, int b){
+        return adjacencyList[a].containsKey(b) ? adjacencyList[a].get(b) : 0;
+    }
+
     public Double getWeightedDistance(int a, int b) {
         Double WeightedDistance = Double.POSITIVE_INFINITY;
         // DIJKSTRA'S SHORTEST PATH O(ElogV)

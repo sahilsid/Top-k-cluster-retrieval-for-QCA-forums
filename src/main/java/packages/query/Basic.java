@@ -1,13 +1,15 @@
 package packages.query;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import packages.mtree.*;
 import packages.textprocess.Tfidf;
 import packages.query.*;
-import packages.userinteraction.Mapping;;
+import packages.userinteraction.Mapping;
+
+import static java.util.stream.Collectors.*;
+import static java.util.Map.Entry.*;
 
 /**
  * Basic Query
@@ -17,6 +19,7 @@ public class Basic {
     List<String> tList;
     List<String> sList;
     List<List<String>> rList;
+    Map<String, Integer> interactionLevel;
     List<String> noise;
     Double Tau;
     Double bound;
@@ -43,11 +46,20 @@ public class Basic {
         this.qids = new LinkedList<String>();
         this.query = q;
         this.root = root;
+        this.interactionLevel = new HashMap<String, Integer>();
         this.Tau = Double.POSITIVE_INFINITY;
         this.tfidf = tfidf;
         this.queryUserId = mapping.QidUid.get(query);
         this.relevantQuestions = new loadRelevantQuestions(root, 3.1, q, tfidf);
         qids.addAll(relevantQuestions.getRelevantQids().keySet());
+        for (String qid : qids) {
+            interactionLevel.put(mapping.QidUid.get(qid),
+                    mapping.getInteractionLevel(mapping.QidUid.get(qid), queryUserId));
+        }
+
+        interactionLevel = interactionLevel.entrySet().stream().sorted(comparingByValue())
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+
         initSList();
         initTList();
         GenerateTopKCluster();
@@ -64,7 +76,7 @@ public class Basic {
         Iterator iter_tlist = tList.iterator();
         Iterator iter_slist = sList.iterator();
 
-        Integer sb;
+        Double sb;
         Double tb;
 
         do {
@@ -80,12 +92,7 @@ public class Basic {
             uid = mapping.QidUid.get((String) iter_slist.next());
             System.out.println(uid);
 
-            sb = mapping.UidUid_commonQs_sorted.containsKey(uid + "." + queryUserId)
-                    ? mapping.UidUid_commonQs_sorted.get(uid + "." + queryUserId)
-                    : mapping.UidUid_commonQs_sorted.containsKey(queryUserId + "." + uid)
-                            ? mapping.UidUid_commonQs_sorted.get(uid + "." + queryUserId)
-                            : 0;
-
+            sb = mapping.getSocialDistance(uid, queryUserId);
             tb = relevantQuestions.getRelevance((String) iter_tlist.next());
             bound = (alpha * (sb)) + ((1 - alpha) * (1 - tb));
 
@@ -95,16 +102,11 @@ public class Basic {
 
     public Double avgSocialDistance(List cList) {
         String uid;
-        Integer socialDistance = 0;
-        Integer sum = 0;
+        Double socialDistance = 0.0;
+        Double sum = 0.0;
         for (Object ques : cList) {
             uid = mapping.QidUid.get((String) ques);
-            if (mapping.UidUid_commonQs_sorted.containsKey(uid + "." + queryUserId))
-                socialDistance = mapping.UidUid_commonQs_sorted.get(uid + "." + queryUserId);
-
-            else if (mapping.UidUid_commonQs_sorted.containsKey(queryUserId + "." + uid))
-                socialDistance = mapping.UidUid_commonQs_sorted.get(uid + "." + queryUserId);
-
+            socialDistance = mapping.getSocialDistance(uid, queryUserId);
             sum += socialDistance;
         }
         return !cList.isEmpty() ? (double) sum / cList.size() : 0.0;
@@ -119,34 +121,26 @@ public class Basic {
     }
 
     public void initSList() {
-
-        for (String Uid : mapping.UidUid_commonQs_sorted.keySet()) {
-            StringTokenizer token = new StringTokenizer(Uid, ".");
-            String user1 = token.nextToken();
-            String user2 = token.nextToken();
-            List<String> qid_user1 = mapping.UidQid.get(user1);
-            List<String> qid_user2 = mapping.UidQid.get(user2);
-            for (String Qid : qids) {
-                if (qid_user1.contains(Qid) || qid_user2.contains(Qid)) {
-                    sList.add(Qid);
-                }
-            }
+        sList = new LinkedList<String>();
+        for (String user : interactionLevel.keySet()) {
+            sList.addAll(qids.stream().filter(mapping.UidQid.get(user)::contains).collect(Collectors.toList()));
         }
         System.out.println("sList Generated : " + sList);
     }
 
     public void initTList() {
 
-        List<Double> sorted_value_list = new LinkedList<Double>(relevantQuestions.getRelevantQids().values());
-        Collections.sort(sorted_value_list);
-        for (Object val : sorted_value_list) {
-            for (Object qid : relevantQuestions.getRelevantQids().keySet()) {
-                if (relevantQuestions.relevantQuestions.get(qid) == val) {
-                    tList.add((String) qid);
-                }
-            }
+        // List<Double> sorted_value_list = new LinkedList<Double>(relevantQuestions.getRelevantQids().values());
+        // Collections.sort(sorted_value_list);
+        // for (Object val : sorted_value_list) {
+        //     for (Object qid : relevantQuestions.getRelevantQids().keySet()) {
+        //         if (relevantQuestions.relevantQuestions.get(qid) == val) {
+        //             tList.add((String) qid);
+        //         }
+        //     }
 
-        }
+        // }
+        tList = new LinkedList<String>(qids);
         System.out.println("tList Generated : " + tList);
     }
 

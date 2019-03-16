@@ -2,6 +2,9 @@ package packages.query;
 
 import java.awt.List;
 import java.util.*;
+import static java.util.stream.Collectors.*;
+import static java.util.Map.Entry.*;
+
 import packages.mtree.Mtree;
 import packages.textprocess.Tfidf;
 
@@ -76,6 +79,9 @@ public class loadRelevantQuestions {
                 }
             }
         }
+        relevantQuestions = relevantQuestions.entrySet().stream().sorted(comparingByValue())
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+
     }
 
 }
