@@ -19,7 +19,7 @@ public class Dataset_batches {
     String file_name;
     String path;
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         // Scanner keyboard = new Scanner(System.in);
         // System.out.println("Enter file name");
         // String file_name = keyboard.nextLine();
@@ -27,7 +27,8 @@ public class Dataset_batches {
         // String path = keyboard.nextLine();
         // JSONObject input_file = getjson(path);
         // JsonNode input_file= jsonImport.getjsonlarge(path);
-        Dataset_batches.getjsonlarge("src/main/resources/android_questions");
+        Dataset_batches.getjsonlarge("src/main/resources/android/android_questions",
+                "src/main/resources/subFiles/questions/subfile");
     }
 
     public Dataset_batches(String file_name, String path) throws Exception {
@@ -36,40 +37,39 @@ public class Dataset_batches {
 
     }
 
-    public static void getjsonlarge(String path) throws Exception {
+    public static void getjsonlarge(String path, String destination) throws Exception {
         // JsonNode input_file=largeJson.readJsonWithObjectMapper(path);
-        JsonNode input_file = jsonImport.getjsonlarge(path+".json");
+        JsonNode input_file = jsonImport.getjsonlarge(path + ".json");
         Iterator<String> nodeIterator = input_file.fieldNames();
         Integer file_number = 1;
         Iterator<String> nodeIterator2 = input_file.fieldNames();
         int count = 0;
-        System.out.println(path);
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode subFile = mapper.createObjectNode();
         OutputStream out;
-
-        out = new FileOutputStream(path + file_number + ".json");
+        Integer threshold = 500;
+        Integer totalSubFiles = threshold >0 ? Math.floorDiv(input_file.size(),threshold )+1: 0 ;
+        JsonNode subFile[] = new JsonNode[totalSubFiles];
+        subFile[0] = mapper.createObjectNode();
+        out = new FileOutputStream(destination + file_number + ".json");
         while (nodeIterator2.hasNext()) {
-            if (count == 5000) {
+
+            if (count == threshold) {
+                count = 0;
+                mapper.writeValue(out, subFile[file_number-1]);
+                subFile[file_number-1]=null;
                 file_number++;
-                mapper.writeValue(out, subFile);
-                subFile = null;
-                out = new FileOutputStream(path + file_number + ".json");
-                subFile =  mapper.createObjectNode();
+                out = new FileOutputStream(destination + file_number + ".json");
+                subFile[file_number-1] = mapper.createObjectNode();
+
             }
             String key = nodeIterator2.next();
-			((ObjectNode) subFile).put(key, input_file.get(key));
+
+            ((ObjectNode) subFile[file_number-1]).put(key, input_file.get(key));
 
             count++;
-            if (count == 5000)
-                break;
-            if (input_file.get(key) == null) {
-                System.exit(0);
-
-            }
-
         }
-        mapper.writeValue(out, subFile);
+        System.out.println(out);
+        mapper.writeValue(out, subFile[file_number-1]);
     }
 
 }
