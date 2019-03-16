@@ -17,7 +17,7 @@ public class Mapping {
 
 //    public Map<String, String> AidQid;
     public Map<String, String> QidUid;
-//    public Map<String, List<String>> UidQid;
+    public Map<String, List<String>> UidQid;
     public Map<String, List<String>> QidAid;
     public Map<String, String> AidUid;
     public Map<String, List<String>> UidAid;
@@ -72,23 +72,23 @@ public class Mapping {
 
     }
 
-    // public void mapUidQn() {
-    //     UidQid = new HashMap<String, List<String>>();
-    //     Iterator<String> nodeIterator = users.fieldNames();
+    public void mapUidQn() {
+        UidQid = new HashMap<String, List<String>>();
+        Iterator<String> nodeIterator = users.fieldNames();
 
-    //     while (nodeIterator.hasNext()) {
-    //         List<String> questionids = new LinkedList<String>();
-    //         String key = nodeIterator.next();// userid
-    //         Iterator<JsonNode> arrayiIterator = users.get(key).get("questions").elements();
-    //         while (arrayiIterator.hasNext()) {
-    //             String val = arrayiIterator.next().asText();
-    //             questionids.add(val);
-    //         }
-    //         UidQid.put(key, new LinkedList<String>(questionids));
-    //         // System.out.println(UidQid.get(key));
-    //     }
-    //     System.out.println("Uid - Qid Generated");
-    // }
+        while (nodeIterator.hasNext()) {
+            List<String> questionids = new LinkedList<String>();
+            String key = nodeIterator.next();// userid
+            Iterator<JsonNode> arrayiIterator = users.get(key).get("questions").elements();
+            while (arrayiIterator.hasNext()) {
+                String val = arrayiIterator.next().asText();
+                questionids.add(val);
+            }
+            UidQid.put(key, new LinkedList<String>(questionids));
+            // System.out.println(UidQid.get(key));
+        }
+        System.out.println("Uid - Qid Generated");
+    }
 
     public void mapUidAns() {
         UidAid = new HashMap<String, List<String>>();

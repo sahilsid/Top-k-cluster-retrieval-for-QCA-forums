@@ -23,8 +23,8 @@ public class Tfidf {
     Map<String, Double> idfMap;
     Map<String, Double> similiarityMap;
     Map<String, List<String>> data;
-    Map<String,Pair<String,Integer>> ifrequency;
-    Map<String,Integer> indexMap;
+    Map<String, Pair<String, Integer>> ifrequency;
+    Map<String, Integer> indexMap;
     JsonNode questions;
     Double similiarityMatrix[][];
     List<String> processed;
@@ -36,18 +36,18 @@ public class Tfidf {
     public Tfidf() throws Exception {
         data = new HashMap<String, List<String>>();
         valueMap = new HashMap<String, Double>();
-        ifrequency = new HashMap<String,Pair<String,Integer>>();
+        ifrequency = new HashMap<String, Pair<String, Integer>>();
         idfMap = new HashMap<String, Double>();
-        indexMap = new HashMap<String,Integer>();
+        indexMap = new HashMap<String, Integer>();
         similiarityMap = new HashMap<String, Double>();
         Preprocess p = new Preprocess();
         questions = jsonImport.getjsonlarge("src/main/resources/android/android_questions.json");
         processed = new LinkedList<String>();
         Iterator<String> nodeIterator = questions.fieldNames();
-        int count =0;
+        int count = 0;
         while (nodeIterator.hasNext()) {
             String key = nodeIterator.next();
-            //System.out.println(count+" . "+key);
+            // System.out.println(count+" . "+key);
             processed = p.keywords(questions.get(key).get("body").toString());
             data.put(key, processed);
             indexMap.put(key, count);
@@ -55,7 +55,7 @@ public class Tfidf {
 
         }
 
-        similiarityMatrix = new Double[data.size()][data.size()];
+        similiarityMatrix = new Double[data.size()][];
         initialize();
     }
 
@@ -76,25 +76,24 @@ public class Tfidf {
             for (String keywords : data.get(qid)) {
                 valueMap.putIfAbsent(qid + "." + keywords, 0.0);
                 idfMap.putIfAbsent(keywords, 0.0);
-                if(ifrequency.containsKey(keywords)){
-                    Pair<String,Integer> lastAdded = ifrequency.get(keywords);
-                    if(lastAdded.getLeft()!=qid){
-                        Pair<String,Integer> newAdded = Pair.of(qid, lastAdded.getRight()+1);
-                        ifrequency.replace(keywords,newAdded);
+                if (ifrequency.containsKey(keywords)) {
+                    Pair<String, Integer> lastAdded = ifrequency.get(keywords);
+                    if (lastAdded.getLeft() != qid) {
+                        Pair<String, Integer> newAdded = Pair.of(qid, lastAdded.getRight() + 1);
+                        ifrequency.replace(keywords, newAdded);
                     }
-                }
-                else{
-                    ifrequency.put(keywords, Pair.of(qid, 1));                    
+                } else {
+                    ifrequency.put(keywords, Pair.of(qid, 1));
                 }
             }
         }
-        //System.out.println(valueMap.size() + "\n " + ifrequency);
+        // System.out.println(valueMap.size() + "\n " + ifrequency);
 
         assignTfIdf();
     }
 
-    void assignTfIdf() throws Exception{
-        Double tf, idf,count=0.0;
+    void assignTfIdf() throws Exception {
+        Double tf, idf, count = 0.0;
         for (String key : valueMap.keySet()) {
             StringTokenizer token = new StringTokenizer(key, ".");
             String qid = token.nextToken();
@@ -106,7 +105,7 @@ public class Tfidf {
 
             idf = idf + ifrequency.get(word).getRight();
             count++;
-            //System.out.println(count +  " : "  + key);
+            // System.out.println(count + " : " + key);
 
             // System.out.println("Word : "+ word + " TF : " + tf +" Idf " + idf);
 
@@ -120,17 +119,16 @@ public class Tfidf {
             // System.out.println("Word c : "+ word + " TF : " + tf*idf +" Idf " + idf);
 
         }
-        //System.out.println("Assigned");
+        // System.out.println("Assigned");
 
         generateSimiliarityMap();
     }
 
-
     public Double similiarity(String q1, String q2) {
         List<String> common_words = new LinkedList<String>(data.get(q1));
         Double psum = 0.0, i_sum_1 = 0.0, i_sum_2 = 0.0;
-        List<String> q1_words = new LinkedList<String>(data.get(q1));
-        List<String> q2_words = new LinkedList<String>(data.get(q2));
+        List<String> q1_words = (data.get(q1));
+        List<String> q2_words = (data.get(q2));
 
         for (String word : q1_words) {
             i_sum_1 = i_sum_1 + Math.pow(valueMap.get(q1 + "." + word), 2);
@@ -153,38 +151,54 @@ public class Tfidf {
     }
 
     void generateSimiliarityMap() throws Exception {
-        int count=0;
+        int count = 1;
+        int colSize = data.size();
         for (Object qid1 : data.keySet()) {
-            
+            similiarityMatrix[indexMap.get(qid1)] = new Double[colSize];
             for (Object qid2 : data.keySet()) {
-                // if (!similiarityMap.containsKey(qid1 + "." + qid2) && !similiarityMap.containsKey(qid2 + "." + qid1)){
-                //     count++;
-                //     similiarityMap.put(qid1 + "." + qid2, similiarity((String) qid1, (String) qid2));
-                //     System.out.println(count+" Adding Similiarity : \n \t" + qid1 +" : "+qid2);
+                // if (!similiarityMap.containsKey(qid1 + "." + qid2) &&
+                // !similiarityMap.containsKey(qid2 + "." + qid1)){
+                // count++;
+                // similiarityMap.put(qid1 + "." + qid2, similiarity((String) qid1, (String)
+                // qid2));
+                // System.out.println(count+" Adding Similiarity : \n \t" + qid1 +" : "+qid2);
                 // }
-                similiarityMatrix[indexMap.get(qid1)][indexMap.get(qid2)] = (similiarity((String) qid1, (String) qid2));
+                if (indexMap.get(qid1) != null && indexMap.get(qid2) != null) {
+                    if (indexMap.get(qid2) < similiarityMatrix[indexMap.get(qid1)].length) {
+                        similiarityMatrix[indexMap.get(qid1)][indexMap.get(qid2)] = (similiarity((String) qid1,
+                                (String) qid2));
+                        System.out.println(count + " Adding Similiarity : \n \t" + qid1 + " : " + qid2);
+                        count++;
+                    }
+                }
             }
+            colSize--;
         }
-        Properties properties = new Properties();
+        // Properties properties = new Properties();
 
-for (Map.Entry<String,Double> entry : similiarityMap.entrySet()) {
-    properties.put(entry.getKey(), ""+ entry.getValue()+"");
-}
+        // for (Map.Entry<String, Double> entry : similiarityMap.entrySet()) {
+        // properties.put(entry.getKey(), "" + entry.getValue() + "");
+        // }
 
-    properties.store(new FileOutputStream("./src/main/resources/offlineResults/similiarityMap.properties"), null);
-        //System.out.println("Similiarity Map Generated : \n \t" + similiarityMap);
+        // properties.store(new
+        // FileOutputStream("./src/main/resources/offlineResults/similiarityMap.properties"),
+        // null);
+        System.out.println("Similiarity Matrix Generated : \n \t");
         // System.out.println("Idf Map Generated : \n \t" + idfMap);
 
     }
 
     public Double getSimiliarity(String qid1, String qid2) {
         Double similiarity = 0.0;
-        // similiarity = (similiarityMap.containsKey(qid1 + "." + qid2) ? similiarityMap.get(qid1 + "." + qid2)
-        //         : (similiarityMap.containsKey(qid2 + "." + qid1) ? similiarityMap.get(qid2 + "." + qid1) : 0.0));
+        // similiarity = (similiarityMap.containsKey(qid1 + "." + qid2) ?
+        // similiarityMap.get(qid1 + "." + qid2)
+        // : (similiarityMap.containsKey(qid2 + "." + qid1) ? similiarityMap.get(qid2 +
+        // "." + qid1) : 0.0));
         //
-        similiarity = (indexMap.containsKey(qid1)&&indexMap.containsKey(qid2) ?  similiarityMatrix[indexMap.get(qid1)][indexMap.get(qid2)] : 0.0);
+        similiarity = (indexMap.containsKey(qid1) && indexMap.containsKey(qid2)
+                ? similiarityMatrix[indexMap.get(qid1)][indexMap.get(qid2)]
+                : 0.0);
 
-        
         similiarity = similiarity > 1 ? 1 : similiarity;
         return similiarity;
     }
@@ -192,14 +206,16 @@ for (Map.Entry<String,Double> entry : similiarityMap.entrySet()) {
     public Double getdistance(String qid1, String qid2) {
         Double similiarity = 0.0;
         // if (similiarityMap.containsKey(qid1 + "." + qid2))
-        //     similiarity = similiarityMap.get(qid1 + "." + qid2);
+        // similiarity = similiarityMap.get(qid1 + "." + qid2);
         // else if (similiarityMap.containsKey(qid2 + "." + qid1))
-        //     similiarity = similiarityMap.get(qid2 + "." + qid1);
+        // similiarity = similiarityMap.get(qid2 + "." + qid1);
 
-        similiarity = (indexMap.containsKey(qid1)&&indexMap.containsKey(qid2) ?  similiarityMatrix[indexMap.get(qid1)][indexMap.get(qid2)] : 0.0);
+        similiarity = (indexMap.containsKey(qid1) && indexMap.containsKey(qid2)
+                ? similiarityMatrix[indexMap.get(qid1)][indexMap.get(qid2)]
+                : 0.0);
 
-
-        //System.out.println(" Similiarity " + qid1 + " : " + qid2 + " : " + similiarity);
+        // System.out.println(" Similiarity " + qid1 + " : " + qid2 + " : " +
+        // similiarity);
         similiarity = similiarity > 1 ? 1 : similiarity;
         return 2 * Math.acos(similiarity);
     }
