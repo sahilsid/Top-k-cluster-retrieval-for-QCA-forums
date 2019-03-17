@@ -116,12 +116,12 @@ public class Cluster {
     }
 
     public void clusterize() {
-        Double similiarity, max;
+        Float similiarity, max;
         clusters.clear();
         String nearestCentroid = "";
         for (String qid : data.keySet()) {
-            similiarity = 0.0;
-            max = -1.0;
+            similiarity = 0.0f;
+            max = -1.0f;
             for (String c : centroids) {
                 similiarity = tfidf.similiarity(qid, c);
                 if ((max == -1 || max < similiarity)) {
@@ -145,15 +145,15 @@ public class Cluster {
         String medoid = "";
         List<String> tempCentroid = new ArrayList<String>();
         boolean centroid_change = false;
-        Double similiarity = 0.0, max = -1.0;
+        Float similiarity = 0.0f, max = -1.0f;
         for (String elem : centroids) {
             tempCentroid.add(elem);
         }
         for (String centroid : tempCentroid) {
-            max = -1.0;
+            max = -1.0f;
             // System.out.println(" Cluster : " + centroid);
             for (String node : clusters.get(centroid)) {
-                similiarity = 0.0;
+                similiarity = 0.0f;
                 for (String clusterNeighbour : clusters.get(centroid)) {
                     similiarity = similiarity + tfidf.similiarity(node, clusterNeighbour);
                 }

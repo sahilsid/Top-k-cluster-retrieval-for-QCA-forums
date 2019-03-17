@@ -152,7 +152,7 @@ public class Mapping {
         return socialGraph.getWeight(indexMap.get(user1), indexMap.get(user2));
     }
 
-    public Double getSocialDistance(String user1, String user2) {
-        return 2 * Math.acos(socialGraph.getWeightedDistance(indexMap.get(user1), indexMap.get(user2)));
+    public Float getSocialDistance(String user1, String user2) {
+        return 2 * (float)Math.acos(socialGraph.getWeightedDistance(indexMap.get(user1), indexMap.get(user2)));
     }
 }

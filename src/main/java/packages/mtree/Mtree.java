@@ -8,14 +8,14 @@ public class Mtree {
     private Data data;
     private LinkedList<Mtree> children;
     private Mtree parent;
-    private double maxDistanceChild;
-    private double radius;
+    private Float maxDistanceChild;
+    private Float radius;
 
     public Mtree() {
         this.parent = null;
         this.children = new LinkedList<>();
-        this.maxDistanceChild = 0.0;
-        this.radius = 0.0;
+        this.maxDistanceChild = 0.0f;
+        this.radius = 0.0f;
     }
 
     public Mtree(Data data) {
@@ -56,7 +56,7 @@ public class Mtree {
         return data.getDataQid();
     }
 
-    public Double getRadius() {
+    public Float getRadius() {
         return radius;
     }
 
@@ -70,8 +70,8 @@ public class Mtree {
         this.parent = parent;
         if (parent.data != null) {
             this.data.setSimiliarity(tfidf.similiarity(parent.data.id, this.data.id));
-            if (parent.maxDistanceChild < 2 * Math.acos(tfidf.similiarity(parent.data.id, this.data.id))+this.radius) {
-                parent.maxDistanceChild = 2 * Math.acos(tfidf.similiarity(parent.data.id, this.data.id)+this.radius);
+            if (parent.maxDistanceChild < 2 * (float)Math.acos(tfidf.similiarity(parent.data.id, this.data.id))+this.radius) {
+                parent.maxDistanceChild = 2 * (float)Math.acos(tfidf.similiarity(parent.data.id, this.data.id)+this.radius);
                 parent.radius = this.radius + parent.maxDistanceChild;
             }
         }

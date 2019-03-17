@@ -21,14 +21,14 @@ public class Basic {
     List<List<String>> rList;
     Map<String, Integer> interactionLevel;
     List<String> noise;
-    Double Tau;
-    Double bound;
+    Float Tau;
+    Float bound;
     Mtree root;
     Mapping mapping;
     String query;
     String queryUserId;
     Tfidf tfidf;
-    Double alpha;
+    Float alpha;
     loadRelevantQuestions relevantQuestions;
 
     public static void main(String[] args) throws Exception {
@@ -47,10 +47,10 @@ public class Basic {
         this.query = q;
         this.root = root;
         this.interactionLevel = new HashMap<String, Integer>();
-        this.Tau = Double.POSITIVE_INFINITY;
+        this.Tau = Float.POSITIVE_INFINITY;
         this.tfidf = tfidf;
         this.queryUserId = mapping.QidUid.get(query);
-        this.relevantQuestions = new loadRelevantQuestions(root, 3.1, q, tfidf);
+        this.relevantQuestions = new loadRelevantQuestions(root, 3.1f, q, tfidf);
         qids.addAll(relevantQuestions.getRelevantQids().keySet());
         for (String qid : qids) {
             interactionLevel.put(mapping.QidUid.get(qid),
@@ -76,8 +76,8 @@ public class Basic {
         Iterator iter_tlist = tList.iterator();
         Iterator iter_slist = sList.iterator();
 
-        Double sb;
-        Double tb;
+        Float sb;
+        Float tb;
 
         do {
 
@@ -100,24 +100,24 @@ public class Basic {
 
     }
 
-    public Double avgSocialDistance(List cList) {
+    public Float avgSocialDistance(List cList) {
         String uid;
-        Double socialDistance = 0.0;
-        Double sum = 0.0;
+        Float socialDistance = 0.0f;
+        Float sum = 0.0f;
         for (Object ques : cList) {
             uid = mapping.QidUid.get((String) ques);
             socialDistance = mapping.getSocialDistance(uid, queryUserId);
             sum += socialDistance;
         }
-        return !cList.isEmpty() ? (double) sum / cList.size() : 0.0;
+        return !cList.isEmpty() ? (Float) sum / cList.size() : 0.0f;
     }
 
-    public Double avgTextualDistance(List cList) {
-        Double text_distance = 0.0;
+    public Float avgTextualDistance(List cList) {
+        Float text_distance = 0.0f;
         for (Object ques : cList) {
             text_distance += relevantQuestions.relevantQuestions.get((String) ques);
         }
-        return cList.isEmpty() ? 0.0 : text_distance / cList.size();
+        return  cList.isEmpty() ? 0.0f : text_distance / cList.size();
     }
 
     public void initSList() {
@@ -130,7 +130,7 @@ public class Basic {
 
     public void initTList() {
 
-        // List<Double> sorted_value_list = new LinkedList<Double>(relevantQuestions.getRelevantQids().values());
+        // List<Float> sorted_value_list = new LinkedList<Float>(relevantQuestions.getRelevantQids().values());
         // Collections.sort(sorted_value_list);
         // for (Object val : sorted_value_list) {
         //     for (Object qid : relevantQuestions.getRelevantQids().keySet()) {
@@ -148,7 +148,7 @@ public class Basic {
 
         String Question;
 
-        RangeQuery range = new RangeQuery(root, 3.1, query, corePoint, tfidf, mapping, 0.5);
+        RangeQuery range = new RangeQuery(root, 3.1f, query, corePoint, tfidf, mapping, 0.5f);
 
         List<String> neighbours = new LinkedList(range.relevantQuestions.keySet());
         List<String> Cluster = new LinkedList<String>();
@@ -172,7 +172,7 @@ public class Basic {
             while (!neighbours.isEmpty()) {
 
                 Question = neighbours.remove(0);
-                range = new RangeQuery(root, 3.1, query, Question, tfidf, mapping, 0.5);
+                range = new RangeQuery(root, 3.1f, query, Question, tfidf, mapping, 0.5f);
                 indirectNeighbours = new LinkedList(range.relevantQuestions.keySet());
 
                 if (indirectNeighbours.size() > qMinPts) {

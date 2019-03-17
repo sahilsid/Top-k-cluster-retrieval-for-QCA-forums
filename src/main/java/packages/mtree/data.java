@@ -4,7 +4,7 @@ import java.util.*;
 
 class Data {
     String id = null;
-    Double parentSimiliarity = null;
+    Float parentSimiliarity = null;
 
     public Data(String id) {
         this.id = id;
@@ -27,7 +27,7 @@ class Data {
         this.parentSimiliarity = data.parentSimiliarity;
     }
 
-    public void setSimiliarity(Double similiarity) {
+    public void setSimiliarity(Float similiarity) {
         this.parentSimiliarity = similiarity;
     }
     public void display(){
